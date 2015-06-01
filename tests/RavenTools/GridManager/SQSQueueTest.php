@@ -8,17 +8,17 @@ use \Mockery as m;
  */
 class SQSQueueTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @var SQSQueue
-     */
-    protected $object;
+	/**
+	 * @var SQSQueue
+	 */
+	protected $object;
 
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
+	/**
+	 * Sets up the fixture, for example, opens a network connection.
+	 * This method is called before a test is executed.
+	 */
+	protected function setUp()
+	{
 		$queue_url = m::mock('Guzzle\Service\Resource\Model');
 		$queue_url->shouldReceive('get')->andReturn("https://sqs.amazon.com/test_queue");
 
@@ -29,25 +29,25 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$this->sqs_client->shouldReceive('sendMessage')->once()->andReturn($guzzle_resource_model);
 		$this->sqs_client->shouldReceive('sendMessage')->once()->andThrow("Exception","failed to send");
 
-        $this->object = new SQSQueue(array(
+		$this->object = new SQSQueue(array(
 			'sqs_client' => $this->sqs_client,
 			'queue_name' => 'test_queue'
 		));
-    }
+	}
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
+	/**
+	 * Tears down the fixture, for example, closes a network connection.
+	 * This method is called after a test is executed.
+	 */
+	protected function tearDown()
+	{
+	}
 
-    /**
-     * @covers SQSQueue::send
-     */
-    public function testSend()
-    {
+	/**
+	 * @covers SQSQueue::send
+	 */
+	public function testSend()
+	{
 		$message = array(
 			"one" => 1,
 			"two" => 2,
@@ -61,14 +61,14 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		var_dump($response);
 		$this->assertFalse($response);
 
-    }
+	}
 
-    /**
-     * @covers SQSQueue::receive
-     * @todo   Implement testReceive().
-     */
-    public function testReceive()
-    {
+	/**
+	 * @covers SQSQueue::receive
+	 * @todo   Implement testReceive().
+	 */
+	public function testReceive()
+	{
 		/*
 		$guzzle_resource_model = m::mock('Guzzle\Service\Resource\Model');
 		$this->sqs_client->shouldReceive('receiveMessage')->once()->andReturn($guzzle_resource_model);
@@ -80,29 +80,29 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$response = $this->object->receive();
 		$this->assertFalse($response);
 		*/
-    }
+	}
 
-    /**
-     * @covers SQSQueue::delete
-     * @todo   Implement testDelete().
-     */
-    public function testDelete()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
+	/**
+	 * @covers SQSQueue::delete
+	 * @todo   Implement testDelete().
+	 */
+	public function testDelete()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 
-    /**
-     * @covers SQSQueue::length
-     * @todo   Implement testLength().
-     */
-    public function testLength()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
+	/**
+	 * @covers SQSQueue::length
+	 * @todo   Implement testLength().
+	 */
+	public function testLength()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 }
