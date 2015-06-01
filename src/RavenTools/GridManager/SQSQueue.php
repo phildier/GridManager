@@ -48,8 +48,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 							"QueueUrl" => $this->queue_url,
 							"MessageBody" => $this->encode($message)
 						));
-		} catch(Exception $e) {
-			error_log("problem sending sqs message ".$e->getMessage());
+		} catch(\Exception $e) {
 			return false;
 		}
 		return $response;
@@ -65,18 +64,22 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 							"QueueUrl" => $this->queue_url,
 							"WaitTimeSeconds" => $this->timeout
 						));
-		} catch(Exception $e) {
-			error_log("exception retrieving sqs message ".$e->getMessage());
+		} catch(\Exception $e) {
 			return false;
 		}
 		$messages = $response->get("Messages");
 		if(is_null($messages)) {
 			return false;
 		}
-		return (object)array(
-					"handle"=>$messages[0]["ReceiptHandle"],
-					"body"=>$this->decode($messages[0]["Body"])
-				);
+
+		$ret = array();
+		foreach($messages as $m) {
+			$ret[] = (object)array(
+						"handle"=>$m["ReceiptHandle"],
+						"body"=>$this->decode($m["Body"])
+					);
+		}
+		return $ret;
 	}
 
 	/**
@@ -89,8 +92,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 							"QueueUrl" => $this->queue_url,
 							"ReceiptHandle" => $handle
 						));
-		} catch(Exception $e) {
-			error_log("exception deleting sqs message ".$e->getMessage());
+		} catch(\Exception $e) {
 			return false;
 		}
 		return $response;
@@ -105,8 +107,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 							"QueueUrl" => $this->queue_url,
 							"AttributeNames" => array("ApproximateNumberOfMessages")
 						));
-		} catch(Exception $e) {
-			error_log("exception getting queue size ".$e->getMessage());
+		} catch(\Exception $e) {
 			return false;
 		}
 		return $response->getPath("Attributes/ApproximateNumberOfMessages");

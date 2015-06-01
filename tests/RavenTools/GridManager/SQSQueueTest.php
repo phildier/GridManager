@@ -25,10 +25,6 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$this->sqs_client = m::mock('Aws\Sqs\SqsClient');
 		$this->sqs_client->shouldReceive('GetQueueUrl')->andReturn($queue_url);
 
-		$guzzle_resource_model = m::mock('Guzzle\Service\Resource\Model');
-		$this->sqs_client->shouldReceive('sendMessage')->once()->andReturn($guzzle_resource_model);
-		$this->sqs_client->shouldReceive('sendMessage')->once()->andThrow("Exception","failed to send");
-
 		$this->object = new SQSQueue(array(
 			'sqs_client' => $this->sqs_client,
 			'queue_name' => 'test_queue'
@@ -48,6 +44,11 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testSend()
 	{
+
+		$guzzle_resource_model = m::mock('Guzzle\Service\Resource\Model');
+		$this->sqs_client->shouldReceive('sendMessage')->once()->andReturn($guzzle_resource_model);
+		$this->sqs_client->shouldReceive('sendMessage')->once()->andThrow(new Exception("failed to send"));
+
 		$message = array(
 			"one" => 1,
 			"two" => 2,
@@ -58,51 +59,74 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Guzzle\Service\Resource\Model',$response);
 
 		$response = $this->object->send($message);
-		var_dump($response);
 		$this->assertFalse($response);
-
 	}
 
 	/**
 	 * @covers SQSQueue::receive
-	 * @todo   Implement testReceive().
 	 */
 	public function testReceive()
 	{
-		/*
+		$response_messages = array(
+			array(
+				"ReceiptHandle" => "deadbeef1",
+				"Body" => '{"Message":"My important sqs message 1"}'
+			),
+			array(
+				"ReceiptHandle" => "deadbeef2",
+				"Body" => '{"Message":"My important sqs message 2"}'
+			)
+		);
+
 		$guzzle_resource_model = m::mock('Guzzle\Service\Resource\Model');
+		$guzzle_resource_model->shouldReceive('get')->once()->andReturn($response_messages);
+
 		$this->sqs_client->shouldReceive('receiveMessage')->once()->andReturn($guzzle_resource_model);
-		$this->sqs_client->shouldReceive('sendMessage')->once()->andThrow("Exception","failed to receive");
+		$this->sqs_client->shouldReceive('receiveMessage')->once()->andThrow(new Exception("failed to receive"));
 
 		$response = $this->object->receive();
-		$this->assertInstanceOf('Guzzle\Service\Resource\Model',$response);
+		$this->assertInternalType('array',$response);
+		$this->assertCount(2,$response);
+
+		foreach($response as $r) {
+			$this->assertObjectHasAttribute('handle',$r);
+			$this->assertObjectHasAttribute('body',$r);
+		}
 
 		$response = $this->object->receive();
 		$this->assertFalse($response);
-		*/
 	}
 
 	/**
 	 * @covers SQSQueue::delete
-	 * @todo   Implement testDelete().
 	 */
 	public function testDelete()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$guzzle_resource_model = m::mock('Guzzle\Service\Resource\Model');
+		$this->sqs_client->shouldReceive('deleteMessage')->once()->andReturn($guzzle_resource_model);
+		$this->sqs_client->shouldReceive('deleteMessage')->once()->andThrow(new Exception("failed to delete"));
+
+		$response = $this->object->delete("deadbeef1");
+		$this->assertInstanceOf('Guzzle\Service\Resource\Model',$response);
+
+		$response = $this->object->delete("deadbeef1");
+		$this->assertFalse($response);
 	}
 
 	/**
 	 * @covers SQSQueue::length
-	 * @todo   Implement testLength().
 	 */
 	public function testLength()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$guzzle_resource_model = m::mock('Guzzle\Service\Resource\Model');
+		$guzzle_resource_model->shouldReceive('getPath')->once()->andReturn(1234);
+		$this->sqs_client->shouldReceive('getQueueAttributes')->once()->andReturn($guzzle_resource_model);
+		$this->sqs_client->shouldReceive('getQueueAttributes')->once()->andThrow(new Exception("failed to get length"));
+
+		$response = $this->object->length();
+		$this->assertEquals(1234,$response);
+
+		$response = $this->object->length();
+		$this->assertFalse($response);
 	}
 }
