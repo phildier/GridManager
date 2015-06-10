@@ -1,0 +1,22 @@
+<?php
+
+require_once("includes/bootstrap.php");
+
+switch($argv[1]) {
+	default:
+		echo "usage: {$argv[0]} (input|worker|output)\n";
+		exit(1);
+		break;
+
+	case "input":
+		\<%=params[:class_name]%>\Input::run();
+		break;
+
+	case "worker":
+		\<%=params[:class_name]%>\Worker::run();
+		break;
+
+	case "output":
+		\<%=params[:class_name]%>\Output::run();
+		break;
+}
