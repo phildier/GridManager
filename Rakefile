@@ -129,7 +129,7 @@ file php_bootstrap_path => php_include_dir do
 end
 
 php_cli_src = "#{template_srcdir}/cli.php.erb"
-php_cli_path = "#{php_include_dir}/cli.php"
+php_cli_path = "#{template_outdir}/cli.php"
 directory php_include_dir => template_outdir
 file php_cli_path => php_include_dir do
 	params = {
@@ -148,7 +148,8 @@ task :init => [
 	bootstrap_script, 
 	cache_dir, 
 	composer_path,
-	php_bootstrap_path
+	php_bootstrap_path,
+	php_cli_path
 ]
 task :default => [:init]
 
