@@ -147,7 +147,6 @@ end
 php_config_src = "#{template_srcdir}/Config.php.erb"
 directory php_include_dir => template_outdir
 php_namespace_dir = "#{php_include_dir}/#{php_namespace}"
-pp php_namespace_dir
 directory php_namespace_dir => php_include_dir
 php_config_path = "#{php_namespace_dir}/Config.php"
 
@@ -159,6 +158,46 @@ file php_config_path => php_namespace_dir do
 	erb_sub(php_config_src, php_config_path, params)
 end
 
+input_class_src = "#{template_srcdir}/Input.php.erb"
+input_class_path = "#{php_namespace_dir}/Input.php"
+file input_class_path => php_namespace_dir do
+	params = {
+		:template_name => template_name,
+		:namespace => classify(template_name)
+	}
+	erb_sub(input_class_src, input_class_path, params)
+end
+
+output_class_src = "#{template_srcdir}/Output.php.erb"
+output_class_path = "#{php_namespace_dir}/Output.php"
+file output_class_path => php_namespace_dir do
+	params = {
+		:template_name => template_name,
+		:namespace => classify(template_name)
+	}
+	erb_sub(output_class_src, output_class_path, params)
+end
+
+worker_class_src = "#{template_srcdir}/Worker.php.erb"
+worker_class_path = "#{php_namespace_dir}/Worker.php"
+file worker_class_path => php_namespace_dir do
+	params = {
+		:template_name => template_name,
+		:namespace => classify(template_name)
+	}
+	erb_sub(worker_class_src, worker_class_path, params)
+end
+
+task :init_php_app => [
+	composer_path,
+	php_bootstrap_path,
+	php_cli_path,
+	php_config_path,
+	input_class_path,
+	output_class_path,
+	worker_class_path
+	]
+
 # set up task and defaults
 task :init => [
 	vagrantfile_path, 
@@ -167,10 +206,7 @@ task :init => [
 	role_path, 
 	bootstrap_script, 
 	cache_dir, 
-	composer_path,
-	php_bootstrap_path,
-	php_cli_path,
-	php_config_path
+	:init_php_app
 ]
 task :default => [:init]
 
