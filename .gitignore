@@ -2,3 +2,4 @@
 vendor/
 *.swp
 .*.swp
+templates/build/

@@ -1,0 +1,16 @@
+#!/bin/bash -ex
+
+chefdk_url='https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.4.0-1.x86_64.rpm'
+chefdk_filename="/vagrant/cache/"`basename $chefdk_url`
+
+# install chef dev kit. (includes berkshelf, needed below)
+if [ ! -f $chefdk_filename ]; then
+    wget -qO "$chefdk_filename" "$chefdk_url"
+    rpm --install "$chefdk_filename"
+fi
+
+yum -y install git
+
+# install 3rd party cookbooks
+cd /vagrant
+berks vendor --except site

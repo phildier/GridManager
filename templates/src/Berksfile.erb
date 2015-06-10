@@ -1,0 +1,8 @@
+# cookbook dependencies for <%=params[:template_name]%>
+source "https://supermarket.getchef.com"
+
+cookbook "<%=params[:cookbook_name]%>", path: "<%=params[:cookbook_name]%>"
+
+cookbook "s3_file"
+cookbook "raven-supervisor", git: "https://github.com/raventools/raven-supervisor.git"
+
