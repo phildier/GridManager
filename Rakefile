@@ -188,6 +188,16 @@ file worker_class_path => php_namespace_dir do
 	erb_sub(worker_class_src, worker_class_path, params)
 end
 
+singleton_class_src = "#{template_srcdir}/Singleton.php.erb"
+singleton_class_path = "#{php_namespace_dir}/Singleton.php"
+file singleton_class_path => php_namespace_dir do
+	params = {
+		:template_name => template_name,
+		:namespace => classify(template_name)
+	}
+	erb_sub(singleton_class_src, singleton_class_path, params)
+end
+
 task :init_php_app => [
 	composer_path,
 	php_bootstrap_path,
@@ -195,7 +205,8 @@ task :init_php_app => [
 	php_config_path,
 	input_class_path,
 	output_class_path,
-	worker_class_path
+	worker_class_path,
+	singleton_class_path
 	]
 
 # set up task and defaults

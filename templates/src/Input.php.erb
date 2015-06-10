@@ -2,8 +2,32 @@
 
 namespace <%=params[:namespace]%>;
 
-class Input {
+class Input extends Singleton {
 
 	public static function run() {
+
+		$input = self::getInstance();
+
+		$grid_manager_input = new \RavenTools\GridManager\Input(
+			array(
+				"load_data_callback" => array($input,"loadData"),
+				"work_item_callback" => array($input,"getWorkItem"),
+				"queue_callback" => array($input,"queueWorkItem"),
+			)
+		);
+
+		return $grid_manager_input->run();
+	}
+
+	public function loadData($batch_size = 100) {
+		return array("one","two","three");
+	}
+
+	public function getWorkItem($work_item) {
+		return $work_item;
+	}
+
+	public function queueWorkItem($work_item) {
+		return true;
 	}
 }
