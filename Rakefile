@@ -17,6 +17,10 @@ template_outdir = "#{output_dir}/#{template_name}"
 
 directory template_outdir
 
+def classify(str)
+	str.split('_').collect(&:capitalize).join
+end
+
 # create Vagrantfile
 vagrantfile_path = "#{template_outdir}/Vagrantfile"
 file vagrantfile_path => template_outdir do
@@ -87,6 +91,7 @@ cache_dir = "#{template_outdir}/cache"
 directory cache_dir => template_outdir
 
 # set up composer.json
+php_namespace = classify(template_name)
 composer_path = "#{template_outdir}/composer.json"
 file composer_path => template_outdir do
 	params = {
@@ -100,6 +105,7 @@ file composer_path => template_outdir do
 		],
 		"autoload" => {
 			"psr-0" => {
+				php_namespace => "includes"
 			}
 		},
 		"repositories" => [
@@ -123,20 +129,34 @@ directory php_include_dir => template_outdir
 file php_bootstrap_path => php_include_dir do
 	params = {
 		:template_name => template_name,
-		:class_name => classify(template_name)
+		:namespace => classify(template_name)
 	}
 	erb_sub(php_bootstrap_src, php_bootstrap_path, params)
 end
 
 php_cli_src = "#{template_srcdir}/cli.php.erb"
 php_cli_path = "#{template_outdir}/cli.php"
-directory php_include_dir => template_outdir
-file php_cli_path => php_include_dir do
+file php_cli_path => template_outdir do
 	params = {
 		:template_name => template_name,
-		:class_name => classify(template_name)
+		:namespace => classify(template_name)
 	}
 	erb_sub(php_cli_src, php_cli_path, params)
+end
+
+php_config_src = "#{template_srcdir}/Config.php.erb"
+directory php_include_dir => template_outdir
+php_namespace_dir = "#{php_include_dir}/#{php_namespace}"
+pp php_namespace_dir
+directory php_namespace_dir => php_include_dir
+php_config_path = "#{php_namespace_dir}/Config.php"
+
+file php_config_path => php_namespace_dir do
+	params = {
+		:template_name => template_name,
+		:namespace => classify(template_name)
+	}
+	erb_sub(php_config_src, php_config_path, params)
 end
 
 # set up task and defaults
@@ -149,7 +169,8 @@ task :init => [
 	cache_dir, 
 	composer_path,
 	php_bootstrap_path,
-	php_cli_path
+	php_cli_path,
+	php_config_path
 ]
 task :default => [:init]
 
@@ -171,8 +192,4 @@ end
 
 def current_version
 	%x(git tag -l | tail -n1).strip
-end
-
-def classify(str)
-	str.split('_').collect(&:capitalize).join
 end

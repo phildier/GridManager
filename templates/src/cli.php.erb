@@ -9,14 +9,14 @@ switch($argv[1]) {
 		break;
 
 	case "input":
-		\<%=params[:class_name]%>\Input::run();
+		\<%=params[:namespace]%>\Input::run();
 		break;
 
 	case "worker":
-		\<%=params[:class_name]%>\Worker::run();
+		\<%=params[:namespace]%>\Worker::run();
 		break;
 
 	case "output":
-		\<%=params[:class_name]%>\Output::run();
+		\<%=params[:namespace]%>\Output::run();
 		break;
 }

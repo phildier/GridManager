@@ -1,0 +1,44 @@
+<?php
+
+namespace <%=params[:namespace]%>;
+
+class Config {
+
+	private static $instance = null;
+
+	public static function bootstrap() {
+		self::getInstance()->loadConfig("config.json");
+	}
+
+	public static function getInstance() {
+		if(!is_object(self::$instance)) {
+			self::$instance = new self;
+		}
+		return self::$instance;
+	}
+
+	public static function get($key) {
+		return $this->config->{$key};
+	}
+
+	protected function __construct() {
+		$this->loadConfig("config.json");
+	}
+
+	protected function loadConfig($path) {
+
+		if(!file_exists($path)) {
+			throw new \Exception("config $path not found");
+		}
+
+		if(($json = file_get_contents($path)) === false) {
+			throw new \Exception("could not read $path");
+		}
+
+		if(($decoded = json_decode($json)) === null) {
+			throw new \Exception("could not decode $path");
+		}
+
+		$this->config = $decoded;
+	}
+}
