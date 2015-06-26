@@ -22,12 +22,12 @@ class Input {
 		}
 
 		if(array_key_exists("work_item_callback",$params)) {
-			if(is_array($params['work_item_callback'])) {
+			if(is_callable($params['work_item_callback'])) {
+				$this->addWorkItemCallback($params['work_item_callback']);
+			} elseif(is_array($params['work_item_callback'])) {
 				foreach($params['work_item_callback'] as $c) {
 					$this->addWorkItemCallback($c);
 				}
-			} else {
-				$this->addWorkItemCallback($params['work_item_callback']);
 			}
 		}
 

@@ -24,12 +24,12 @@ class Output {
 		}
 
 		if(array_key_exists("output_item_callback",$params)) {
-			if(is_array($params['output_item_callback'])) {
+			if(is_callable($params['output_item_callback'])) {
+				$this->addOutputItemCallback($params['output_item_callback']);
+			} elseif(is_array($params['output_item_callback'])) {
 				foreach($params['output_item_callback'] as $c) {
 					$this->addOutputItemCallback($c);
 				}
-			} else {
-				$this->addOutputItemCallback($params['output_item_callback']);
 			}
 		}
 
