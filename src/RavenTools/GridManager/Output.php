@@ -56,7 +56,7 @@ class Output {
 		if(is_callable($callback)) {
 			$this->dequeue_callback = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 
@@ -70,7 +70,7 @@ class Output {
 		if(is_callable($callback)) {
 			$this->output_item_callbacks[] = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 
@@ -83,7 +83,7 @@ class Output {
 		if(is_callable($callback)) {
 			$this->write_data_callback = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 

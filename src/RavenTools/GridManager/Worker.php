@@ -46,7 +46,7 @@ class Worker {
 		if(is_callable($callback)) {
 			$this->dequeue_callback = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 
@@ -60,7 +60,7 @@ class Worker {
 		if(is_callable($callback)) {
 			$this->work_item_callbacks[] = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 
@@ -71,7 +71,7 @@ class Worker {
 		if(is_callable($callback)) {
 			$this->queue_callback = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 

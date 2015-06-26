@@ -49,7 +49,7 @@ class Input {
 		if(is_callable($callback)) {
 			$this->load_data_callback = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 
@@ -62,7 +62,7 @@ class Input {
 		if(is_callable($callback)) {
 			$this->work_item_callbacks[] = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 
@@ -74,7 +74,7 @@ class Input {
 		if(is_callable($callback)) {
 			$this->queue_callback = $callback;
 		} else {
-			throw new Exception("callable argument required");
+			throw new \Exception("callable argument required");
 		}
 	}
 
