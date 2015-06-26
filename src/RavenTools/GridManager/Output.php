@@ -52,8 +52,12 @@ class Output {
 	 * expected to block for a defined period and return an output item if available, or
 	 * return false after a timeout.
 	 */
-	public function setDequeueCallback(Callable $callback) {
-		$this->dequeue_callback = $callback;
+	public function setDequeueCallback($callback) {
+		if(is_callable($callback)) {
+			$this->dequeue_callback = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**
@@ -62,8 +66,12 @@ class Output {
 	 * sent as the input to the next.  the resulting output items are batched and sent to the
 	 * write data callback.
 	 */
-	public function addOutputItemCallback(Callable $callback) {
-		$this->output_item_callbacks[] = $callback;
+	public function addOutputItemCallback($callback) {
+		if(is_callable($callback)) {
+			$this->output_item_callbacks[] = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**
@@ -71,8 +79,12 @@ class Output {
 	 * persistent storage.  an array of output items are passed in and a boolean response
 	 * is expected.
 	 */
-	public function setWriteDataCallback(Callable $callback) {
-		$this->write_data_callback = $callback;
+	public function setWriteDataCallback($callback) {
+		if(is_callable($callback)) {
+			$this->write_data_callback = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**

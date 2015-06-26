@@ -45,8 +45,12 @@ class Input {
 	 * sets a callback to load job data.  
 	 * the callback's expected to return an Iterator
 	 */
-	public function setLoadDataCallback(Callable $callback) {
-		$this->load_data_callback = $callback;
+	public function setLoadDataCallback($callback) {
+		if(is_callable($callback)) {
+			$this->load_data_callback = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**
@@ -54,16 +58,24 @@ class Input {
 	 * the callback is expected to return an array or object, which will be passed into the next callback
 	 * in the chain. the return from the final callback is pushed to the queue
 	 */
-	public function addWorkItemCallback(Callable $callback) {
-		$this->work_item_callbacks[] = $callback;
+	public function addWorkItemCallback($callback) {
+		if(is_callable($callback)) {
+			$this->work_item_callbacks[] = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**
 	 * sets a queue callback which is responsible for pushing a message to a queue.
 	 * the callback is expected to return true on success, false on failure
 	 */
-	public function setQueueCallback(Callable $callback) {
-		$this->queue_callback = $callback;
+	public function setQueueCallback($callback) {
+		if(is_callable($callback)) {
+			$this->queue_callback = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**

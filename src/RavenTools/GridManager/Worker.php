@@ -42,8 +42,12 @@ class Worker {
 	 * expected to block for a defined period and return an output item if available, or
 	 * return false after a timeout.
 	 */
-	public function setDequeueCallback(Callable $callback) {
-		$this->dequeue_callback = $callback;
+	public function setDequeueCallback($callback) {
+		if(is_callable($callback)) {
+			$this->dequeue_callback = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**
@@ -52,15 +56,23 @@ class Worker {
 	 * sent as the input to the next.  the resulting output items are batched and sent to the
 	 * write data callback.
 	 */
-	public function addWorkItemCallback(Callable $callback) {
-		$this->work_item_callbacks[] = $callback;
+	public function addWorkItemCallback($callback) {
+		if(is_callable($callback)) {
+			$this->work_item_callbacks[] = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**
 	 * sets a callback to queue output items to the output queue
 	 */
-	public function setQueueCallback(Callable $callback) {
-		$this->queue_callback = $callback;
+	public function setQueueCallback($callback) {
+		if(is_callable($callback)) {
+			$this->queue_callback = $callback;
+		} else {
+			throw new Exception("callable argument required");
+		}
 	}
 
 	/**
@@ -102,6 +114,4 @@ class Worker {
 
 		return $response;
 	}
-
 }
-
