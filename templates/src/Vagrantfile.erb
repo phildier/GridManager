@@ -11,6 +11,7 @@ config_overrides = JSON.parse(IO.read(overrides_json))
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
 	config.vm.box = "<%=params[:vagrant_box]%>"
+	config.vm.box_url = "<%=params[:vagrant_box_url]%>"
 	config.vm.network "forwarded_port", guest: 80, host: 8080
 	config.vm.network "private_network", ip: "10.122.0.11"
 

@@ -15,15 +15,19 @@ class Log {
 		return $message;
 	}
 
+	public static function send($level,$message) {
+		printf("[%s] [%s] %s %s\n",self::ts(),getmypid(),$level,self::encode($message));
+	}
+
 	public static function info($message) {
-		printf("[%s] INFO %s\n",self::ts(),self::encode($message));
+		self::send("INFO",$message);
 	}
 
 	public static function warn($message) {
-		printf("[%s] WARN %s\n",self::ts(),self::encode($message));
+		self::send("WARN",$message);
 	}
 
 	public static function error($message) {
-		printf("[%s] ERROR %s\n",self::ts(),self::encode($message));
+		self::send("ERROR",$message);
 	}
 }

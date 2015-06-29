@@ -6,6 +6,7 @@ require 'json'
 # optiional parameters and their defaults
 template_name = ENV['TEMPLATE_NAME'] || "new_template"
 vagrant_box = ENV['VAGRANT_BOX'] || "centos64"
+vagrant_box_url = ENV['VAGRANT_BOX_URL'] || "http://raven-opensource.s3.amazonaws.com/centos64.box"
 output_dir = ENV['OUTPUT_DIR'] || "templates/build"
 author_name = ENV["AUTHOR_NAME"] || "Admin"
 author_email = ENV["AUTHOR_EMAIL"] || "admin@raventools.com"
@@ -27,7 +28,8 @@ file vagrantfile_path => template_outdir do
 	# template input parameters
 	params = {
 		:template_name => template_name,
-		:vagrant_box => vagrant_box
+		:vagrant_box => vagrant_box,
+		:vagrant_box_url => vagrant_box_url
 	}
 	erb_sub("#{template_srcdir}/Vagrantfile.erb",vagrantfile_path,params)
 end

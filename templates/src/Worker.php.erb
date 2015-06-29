@@ -22,6 +22,7 @@ class Worker extends Singleton {
 		);
 
 		$running = true;
+		$processed = 0;
 
 		while($running) {
 			$response = $grid_manager_worker->run();
@@ -29,6 +30,8 @@ class Worker extends Singleton {
 			Log::info($response);
 
 			if($response['failure'] > $response['success']) {
+				sleep(1);
+			} elseif($response['failure'] == 0 && $response['success'] == 0) {
 				sleep(1);
 			} elseif($processed++ > self::$num_to_process) {
 				$running = false;
