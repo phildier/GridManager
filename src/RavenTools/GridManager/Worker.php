@@ -95,21 +95,23 @@ class Worker {
 
 		$output_item_buffer = array();
 
-		foreach($data as $work_item) {
+		if($data !== false) {
+			foreach($data as $work_item) {
 
-			foreach($this->work_item_callbacks as $cb) {
-				$work_item = $cb($work_item);
+				foreach($this->work_item_callbacks as $cb) {
+					$work_item = $cb($work_item);
+				}
+
+				$output_item_buffer[] = $work_item;
 			}
 
-			$output_item_buffer[] = $work_item;
-		}
-
-		$cb = $this->queue_callback;
-		if($cb($output_item_buffer) === true) {
-			$response['success'] = 1;
-			$response['items'] += count($output_item_buffer);
-		} else {
-			$response['failure'] = 1;
+			$cb = $this->queue_callback;
+			if($cb($output_item_buffer) === true) {
+				$response['success'] = 1;
+				$response['items'] += count($output_item_buffer);
+			} else {
+				$response['failure'] = 1;
+			}
 		}
 
 		return $response;

@@ -45,13 +45,46 @@ file berksfile_path => [berks_cookbooks_dir] do
 end
 
 # create cookbook
-task :cookbook_init => template_outdir do
+cookbook_path = "#{template_outdir}/#{cookbook_name}"
+recipe_path = "#{cookbook_path}/recipes"
+default_recipe_path = "#{recipe_path}/default.rb"
+file default_recipe_path => template_outdir do
+	params = {
+		:program_name => template_name,
+		:cookbook_name => template_name
+	}
+	erb_sub("#{template_srcdir}/recipes_default.rb.erb",default_recipe_path,params)
+end
+
+attribute_path = "#{cookbook_path}/attributes"
+default_attribute_path = "#{attribute_path}/default.rb"
+file default_attribute_path => template_outdir do
+	params = {
+		:program_name => template_name,
+		:cookbook_name => template_name
+	}
+	erb_sub("#{template_srcdir}/attributes_default.rb.erb",default_attribute_path,params)
+end
+
+metadata_path = "#{cookbook_path}/metadata.rb"
+file metadata_path => template_outdir do
+	params = {
+		:cookbook_name => template_name
+	}
+	erb_sub("#{template_srcdir}/metadata.rb.erb",metadata_path,params)
+end
+
+task :create_cookbook => template_outdir do
 	Dir.chdir(template_outdir) do
 		if !::File.exists?(cookbook_name) then
 			sh "knife cookbook create #{cookbook_name} -o ."
+			sh "rm #{cookbook_name}/recipes/default.rb"
+			sh "rm #{cookbook_name}/metadata.rb"
 		end
 	end
 end
+
+task :cookbook_init => [:create_cookbook, default_recipe_path, default_attribute_path, metadata_path]
 
 # configure role
 role_dir = "#{template_outdir}/roles"
@@ -198,6 +231,16 @@ file singleton_class_path => php_namespace_dir do
 	erb_sub(singleton_class_src, singleton_class_path, params)
 end
 
+log_class_src = "#{template_srcdir}/Log.php.erb"
+log_class_path = "#{php_namespace_dir}/Log.php"
+file log_class_path => php_namespace_dir do
+	params = {
+		:namespace => classify(template_name)
+	}
+	erb_sub(log_class_src, log_class_path, params)
+end
+
+
 task :init_php_app => [
 	composer_path,
 	php_bootstrap_path,
@@ -206,7 +249,8 @@ task :init_php_app => [
 	input_class_path,
 	output_class_path,
 	worker_class_path,
-	singleton_class_path
+	singleton_class_path,
+	log_class_path
 	]
 
 # set up task and defaults

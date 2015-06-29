@@ -3,6 +3,7 @@ source "https://supermarket.getchef.com"
 
 cookbook "<%=params[:cookbook_name]%>", path: "<%=params[:cookbook_name]%>"
 
+cookbook "yum"
 cookbook "s3_file"
 cookbook "raven-supervisor", git: "https://github.com/raventools/raven-supervisor.git"
 

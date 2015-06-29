@@ -1,0 +1,28 @@
+include_recipe "raven-supervisor"
+
+yum_repository 'epel' do
+	description 'Extra Packages for Enterprise Linux'
+	mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
+	gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
+	action :create
+end
+
+yum_repository 'rightscale-epel' do
+	description 'Rightscale - Extra Packages for Enterprise Linux'
+	baseurl 'http://mirror.rightscale.com/rightscale_software/epel/6/x86_64/archive/20141120'
+	gpgkey ' https://s3.amazonaws.com/rightscale_key_pub/rightscale_key.pub'
+	action :create
+end
+
+# install php 5.4 and modules
+package "php54"
+
+# set up worker in supervisor
+raven_supervisor_program "<%=params[:program_name]%>" do
+	directory node[:<%=params[:cookbook_name]%>][:deploy][:directory]
+	command "php cli.php worker"
+	numprocs node[:<%=params[:cookbook_name]%>][:worker][:numprocs]
+	user node[:<%=params[:cookbook_name]%>][:worker][:user]
+
+	notifies :restart, "service[supervisord]", :delayed
+end

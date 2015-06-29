@@ -1,0 +1,29 @@
+<?php
+
+namespace <%=params[:namespace]%>;
+
+class Log {
+
+	public static function ts() {
+		return date("c");
+	}
+
+	public static function encode($message) {
+		if(gettype($message) != "string") {
+			return json_encode($message);
+		}
+		return $message;
+	}
+
+	public static function info($message) {
+		printf("[%s] INFO %s\n",self::ts(),self::encode($message));
+	}
+
+	public static function warn($message) {
+		printf("[%s] WARN %s\n",self::ts(),self::encode($message));
+	}
+
+	public static function error($message) {
+		printf("[%s] ERROR %s\n",self::ts(),self::encode($message));
+	}
+}

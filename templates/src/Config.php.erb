@@ -7,7 +7,8 @@ class Config {
 	private static $instance = null;
 
 	public static function bootstrap() {
-		self::getInstance()->loadConfig("config.json");
+		$c = self::getInstance();
+		date_default_timezone_set($c->get("timezone"));
 	}
 
 	public static function getInstance() {
@@ -17,7 +18,7 @@ class Config {
 		return self::$instance;
 	}
 
-	public static function get($key) {
+	public function get($key) {
 		return $this->config->{$key};
 	}
 

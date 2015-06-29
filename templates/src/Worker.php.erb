@@ -2,8 +2,58 @@
 
 namespace <%=params[:namespace]%>;
 
-class Worker {
+class Worker extends Singleton {
 
+	public static $num_to_process = 100;
+
+	/**
+	 * sets up worker object and begins polling and processing jobs
+	 */
 	public static function run() {
+
+		$worker = self::getInstance();
+
+		$grid_manager_worker = new \RavenTools\GridManager\Worker(
+			array(
+				'dequeue_callback' => array($worker,"dequeue"),
+				'work_item_callback' => array($worker,"process"),
+				'queue_callback' => array($worker,"queue")
+			)
+		);
+
+		$running = true;
+
+		while($running) {
+			$response = $grid_manager_worker->run();
+
+			Log::info($response);
+
+			if($response['failure'] > $response['success']) {
+				sleep(1);
+			} elseif($processed++ > self::$num_to_process) {
+				$running = false;
+			}
+		}
+	}
+
+	/**
+	 * dequeues a single work item. returns 1 or more work items
+	 */
+	public function dequeue() {
+		return false;
+	}
+
+	/**
+	 * processes the work item, return processed work item
+	 */
+	public function process($work_item) {
+		return $work_item;
+	}
+
+	/**
+	 * queues work items to output queue, returns boolean
+	 */
+	public function queue($work_item_batch) {
+		return false;
 	}
 }
