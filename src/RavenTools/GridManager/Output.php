@@ -103,7 +103,7 @@ class Output {
 				);
 
 		$cb = $this->dequeue_callback;
-		$data = $cb($this->dequeue_batch_size);
+		$data = call_user_func($cb,$this->dequeue_batch_size);
 
 		$write_data_buffer = array();
 
@@ -112,7 +112,7 @@ class Output {
 			$output_item = $d;
 
 			foreach($this->output_item_callbacks as $cb) {
-				$output_item = $cb($output_item);
+				$output_item = call_user_func($cb,$output_item);
 			}
 
 			if(count($write_data_buffer) < $this->write_data_batch_size) {
@@ -141,7 +141,7 @@ class Output {
 	protected function writeData(Array $buffer,&$response) {
 
 		$cb = $this->write_data_callback;
-		if($cb($buffer) === true) {
+		if(call_user_func($cb,$buffer) === true) {
 			$response['success']++;
 			$response['items'] += count($buffer);
 			return true;

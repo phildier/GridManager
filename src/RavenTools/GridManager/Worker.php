@@ -91,7 +91,7 @@ class Worker {
 				);
 
 		$cb = $this->dequeue_callback;
-		$data = $cb();
+		$data = call_user_func($cb);
 
 		$output_item_buffer = array();
 
@@ -99,14 +99,14 @@ class Worker {
 			foreach($data as $work_item) {
 
 				foreach($this->work_item_callbacks as $cb) {
-					$work_item = $cb($work_item);
+					$work_item = call_user_func($cb,$work_item);
 				}
 
 				$output_item_buffer[] = $work_item;
 			}
 
 			$cb = $this->queue_callback;
-			if($cb($output_item_buffer) === true) {
+			if(call_user_func($cb,$output_item_buffer) === true) {
 				$response['success'] = 1;
 				$response['items'] += count($output_item_buffer);
 			} else {

@@ -93,16 +93,16 @@ class Input {
 				);
 
 		$cb = $this->load_data_callback;
-		$data = $cb($this->batch_size);
+		$data = call_user_func($cb,$this->batch_size);
 
 		foreach($data as $d) {
 			$work_item = $d;
 			foreach($this->work_item_callbacks as $cb) {
-				$work_item = $cb($work_item);
+				$work_item = call_user_func($cb,$work_item);
 			}
 
 			$cb = $this->queue_callback;
-			if($cb($work_item) === true) {
+			if(call_user_func($cb,$work_item) === true) {
 				$response['success']++;
 			} else {
 				$response['failure']++;
