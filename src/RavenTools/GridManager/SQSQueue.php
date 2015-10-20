@@ -62,7 +62,8 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 		try {
 			$response = $this->sqs_client->receiveMessage(array(
 							"QueueUrl" => $this->queue_url,
-							"WaitTimeSeconds" => $this->timeout
+							"WaitTimeSeconds" => $this->timeout,
+							"MaxNumberOfMessages" => $num
 						));
 		} catch(\Exception $e) {
 			return false;
