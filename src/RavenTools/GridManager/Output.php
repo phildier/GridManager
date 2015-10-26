@@ -9,6 +9,7 @@ class Output {
 	protected $write_data_callback = null;
 	protected $dequeue_batch_size = 10;
 	protected $write_data_batch_size = 100;
+	protected $max_dequeue_polls = 10;
 
 	public function __construct(Array $params) {
 		$this->validateAndSetParams($params);
@@ -43,6 +44,10 @@ class Output {
 
 		if(array_key_exists("write_data_batch_size",$params)) {
 			$this->write_data_batch_size = $params['write_data_batch_size'];
+		}
+
+		if(array_key_exists("max_dequeue_polls",$params)) {
+			$this->max_dequeue_polls = $params['max_dequeue_polls'];
 		}
 
 	}
@@ -102,28 +107,32 @@ class Output {
 				"items" => 0
 				);
 
-		$cb = $this->dequeue_callback;
-		$data = call_user_func($cb,$this->dequeue_batch_size);
+		$polls = 0;
+		while($polls++ < $this->max_dequeue_polls) {
 
-		$write_data_buffer = array();
+			$cb = $this->dequeue_callback;
+			$data = call_user_func($cb,$this->dequeue_batch_size);
 
-		foreach($data as $d) {
+			$write_data_buffer = array();
 
-			$output_item = $d;
+			foreach($data as $d) {
 
-			foreach($this->output_item_callbacks as $cb) {
-				$output_item = call_user_func($cb,$output_item);
-			}
+				$output_item = $d;
 
-			if(count($write_data_buffer) < $this->write_data_batch_size) {
-				$write_data_buffer[] = $output_item;
-			} else {
+				foreach($this->output_item_callbacks as $cb) {
+					$output_item = call_user_func($cb,$output_item);
+				}
 
-				$this->writeData($write_data_buffer,$response);
+				if(count($write_data_buffer) < $this->write_data_batch_size) {
+					$write_data_buffer[] = $output_item;
+				} else {
 
-				// TODO sane failed write_data retries.
-				// for now clear write buffer on both success and failure
-				$write_data_buffer = array();
+					$this->writeData($write_data_buffer,$response);
+
+					// TODO sane failed write_data retries.
+					// for now clear write buffer on both success and failure
+					$write_data_buffer = array();
+				}
 			}
 		}
 
