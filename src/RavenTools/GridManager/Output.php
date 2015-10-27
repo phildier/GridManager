@@ -107,13 +107,13 @@ class Output {
 				"items" => 0
 				);
 
+		$write_data_buffer = array();
 		$polls = 0;
+
 		while($polls++ < $this->max_dequeue_polls) {
 
 			$cb = $this->dequeue_callback;
 			$data = call_user_func($cb,$this->dequeue_batch_size);
-
-			$write_data_buffer = array();
 
 			foreach($data as $d) {
 
