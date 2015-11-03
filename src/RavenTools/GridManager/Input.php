@@ -101,6 +101,11 @@ class Input {
 				$work_item = call_user_func($cb,$work_item);
 			}
 
+			if($work_item === false) {
+				$response['skipped']++;
+				continue;
+			}
+
 			$cb = $this->queue_callback;
 			if(call_user_func($cb,$work_item) === true) {
 				$response['success']++;
