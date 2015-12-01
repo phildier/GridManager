@@ -31,7 +31,9 @@ class OutputTest extends \PHPUnit_Framework_TestCase
 			},
 			'write_data_callback' => function($data) {
 				return true;
-			}
+			},
+			'dequeue_batch_size' => 1,
+			'max_dequeue_polls' => 1
 		));
     }
 
