@@ -4,16 +4,7 @@ namespace RavenTools\GridManager;
 
 abstract class Config extends Singleton {
 
-	private static $instance = null;
-
 	abstract public static function bootstrap();
-
-	final public static function getInstance() {
-		if(!is_object(self::$instance)) {
-			self::$instance = new self;
-		}
-		return self::$instance;
-	}
 
 	public function get($key) {
 		return $this->config->{$key};
