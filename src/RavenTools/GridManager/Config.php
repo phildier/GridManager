@@ -6,8 +6,7 @@ abstract class Config extends Singleton {
 
 	private static $instance = null;
 
-	abstract public static function bootstrap() {
-	}
+	abstract public static function bootstrap();
 
 	final public static function getInstance() {
 		if(!is_object(self::$instance)) {
