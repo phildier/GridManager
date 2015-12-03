@@ -6,6 +6,10 @@ class Worker extends Singleton {
 
 	public static $num_to_process = 100;
 
+	protected function __construct() {
+		parent::__construct();
+	}
+
 	/**
 	 * sets up worker object and begins polling and processing jobs
 	 */

@@ -4,6 +4,10 @@ namespace <%=params[:namespace]%>;
 
 class Input extends Singleton {
 
+	protected function __construct() {
+		parent::__construct();
+	}
+
 	public static function run() {
 
 		$input = self::getInstance();

@@ -1,0 +1,9 @@
+include_recipe "raven-supervisor"
+
+raven_deploy_app "gwt_searchanalytics" do
+	path node[:<%=params[:cookbook_name]%>][:deploy_tag][:path]
+	owner node[:<%=params[:cookbook_name]%>][:deploy_tag][:user]
+	repository node[:<%=params[:cookbook_name]%>][:deploy_tag][:repository]
+	revision node[:<%=params[:cookbook_name]%>][:deploy_tag][:branch]
+	deploy_key node[:<%=params[:cookbook_name]%>][:deploy_tag][:key]
+end

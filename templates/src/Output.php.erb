@@ -4,6 +4,45 @@ namespace <%=params[:namespace]%>;
 
 class Output {
 
+	protected function __construct() {
+		parent::__construct();
+	}
+
 	public static function run() {
+
+        $output = self::getInstance();
+
+        $grid_manager_output = new \RavenTools\GridManager\Output(
+            array(
+                "dequeue_callback" => array($output,"dequeue"),
+                "output_item_callback" => array($output,"process"),
+                "write_data_callback" => array($output,"write"),
+                "dequeue_batch_size" => 10,
+                "max_dequeue_polls" => 20
+            )
+        );
+
+        $response = $grid_manager_output->run();
+
+        Log::info($response);
+
+        return $response;
+	}
+
+	public function dequeue($batch_size=1) {
+		return array(); // return an array of one or more output items
+	}
+
+	public function process($output_item) {
+		return $output_item;
+	}
+
+	public function write($output_item_batch) {
+
+		foreach($output_item_batch as $item) {
+
+		}
+
+		return true;
 	}
 }

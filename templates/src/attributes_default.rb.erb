@@ -1,7 +1,9 @@
 # deploy parameters
-default[:<%=params[:cookbook_name]%>][:deploy][:directory] = "/vagrant"
-default[:<%=params[:cookbook_name]%>][:deploy][:user] = "nobody"
-default[:<%=params[:cookbook_name]%>][:deploy][:branch] = "master"
+default[:<%=params[:cookbook_name]%>][:deploy_tag][:path] = "/home/webapps/<%=params[:cookbook_name]%>"
+default[:<%=params[:cookbook_name]%>][:deploy_tag][:user] = "www-data"
+default[:<%=params[:cookbook_name]%>][:deploy_tag][:repository] = ""
+default[:<%=params[:cookbook_name]%>][:deploy_tag][:branch] = "master"
+default[:<%=params[:cookbook_name]%>][:deploy_tag][:key] = ""
 
 # worker parameters
 default[:<%=params[:cookbook_name]%>][:worker][:numprocs] = 1

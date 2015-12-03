@@ -58,6 +58,15 @@ file default_recipe_path => template_outdir do
 	erb_sub("#{template_srcdir}/recipes_default.rb.erb",default_recipe_path,params)
 end
 
+deploy_tag_recipe_path = "#{recipe_path}/deploy_tag.rb"
+file deploy_tag_recipe_path => template_outdir do
+	params = {
+		:program_name => template_name,
+		:cookbook_name => template_name
+	}
+	erb_sub("#{template_srcdir}/recipes_default.rb.erb",deploy_tag_recipe_path,params)
+end
+
 attribute_path = "#{cookbook_path}/attributes"
 default_attribute_path = "#{attribute_path}/default.rb"
 file default_attribute_path => template_outdir do
@@ -156,6 +165,18 @@ file composer_path => template_outdir do
 	json_file(composer_path,params)
 end
 
+# set up overrrides.json.example
+overrides_path = "#{template_outdir}/overrides.json.example"
+file overrides_path => template_outdir do
+	params = {
+		"raven_deploy" => {
+			"aws_key" => "your aws key",
+			"aws_secret" => "your aws secret"
+		}
+	}
+	json_file(overrides_path,params)
+end
+
 # set up php application
 php_include_dir = "#{template_outdir}/includes"
 php_bootstrap_src = "#{template_srcdir}/bootstrap.php.erb"
@@ -223,16 +244,6 @@ file worker_class_path => php_namespace_dir do
 	erb_sub(worker_class_src, worker_class_path, params)
 end
 
-singleton_class_src = "#{template_srcdir}/Singleton.php.erb"
-singleton_class_path = "#{php_namespace_dir}/Singleton.php"
-file singleton_class_path => php_namespace_dir do
-	params = {
-		:template_name => template_name,
-		:namespace => classify(template_name)
-	}
-	erb_sub(singleton_class_src, singleton_class_path, params)
-end
-
 log_class_src = "#{template_srcdir}/Log.php.erb"
 log_class_path = "#{php_namespace_dir}/Log.php"
 file log_class_path => php_namespace_dir do
@@ -251,7 +262,6 @@ task :init_php_app => [
 	input_class_path,
 	output_class_path,
 	worker_class_path,
-	singleton_class_path,
 	log_class_path
 	]
 
@@ -259,6 +269,7 @@ task :init_php_app => [
 task :init => [
 	vagrantfile_path, 
 	berksfile_path, 
+	overrides_path,
 	:cookbook_init, 
 	role_path, 
 	bootstrap_script, 
