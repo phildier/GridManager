@@ -130,6 +130,17 @@ file bootstrap_script => [scripts_dir] do
 	erb_sub("#{template_srcdir}/vagrant_bootstrap.sh.erb",bootstrap_script,params)
 end
 
+# create README.md
+readme_path = "#{template_outdir}/README.md"
+readme_src = "#{template_srcdir}/README.md.erb"
+file readme_path => template_outdir do
+	params = {
+		"project_name" => classify(template_name),
+		"template_name" => template_name
+	}
+	erb_sub(readme_src, readme_path, params)
+end
+
 # set up cache directory
 cache_dir = "#{template_outdir}/cache"
 directory cache_dir => template_outdir
@@ -188,6 +199,22 @@ file php_bootstrap_path => php_include_dir do
 		:namespace => classify(template_name)
 	}
 	erb_sub(php_bootstrap_src, php_bootstrap_path, params)
+end
+
+app_config_path = "#{template_outdir}/config.json"
+file app_config_path => template_outdir do
+	params = {
+		"timezone" => "US/Eastern"
+	}
+	json_file(app_config_path,params)
+end
+
+app_vagrant_config_path = "#{template_outdir}/config-vagrant.json"
+file app_vagrant_config_path => template_outdir do
+	params = {
+		"timezone" => "US/Eastern"
+	}
+	json_file(app_vagrant_config_path,params)
 end
 
 php_cli_src = "#{template_srcdir}/cli.php.erb"
@@ -253,9 +280,11 @@ file log_class_path => php_namespace_dir do
 	erb_sub(log_class_src, log_class_path, params)
 end
 
-
+# tasks associated with the php app
 task :init_php_app => [
 	composer_path,
+	app_config_path,
+	app_vagrant_config_path,
 	php_bootstrap_path,
 	php_cli_path,
 	php_config_path,
@@ -274,6 +303,7 @@ task :init => [
 	role_path, 
 	bootstrap_script, 
 	cache_dir, 
+	readme_path,
 	:init_php_app
 ]
 task :default => [:init]
@@ -288,12 +318,14 @@ def erb_sub(src, dst, params)
 	end
 end
 
+# given a file path, writes contents in json format
 def json_file(path, contents)
 	File.open(path,'w') do |f|
 		f.write JSON.pretty_generate(contents)
 	end
 end
 
+# retrieve current version (tag) of GridManager
 def current_version
-	%x(git tag -l | tail -n1).strip
+	%x(git tag -l | sort -V | tail -n1).strip
 end

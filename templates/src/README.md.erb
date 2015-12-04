@@ -1,0 +1,15 @@
+### <%=params['project_name']%>
+
+Batch processing of <%=params['project_name']%>
+
+### Setup
+
+- copy `overrides.json.example` to `overrides.json` and fill in your AWS IAM key pairs
+- `vagrant up`
+
+### Testing
+
+- `cd /home/webapps/<%=params['template_name']%>`
+- To run queue process: `php cli.php input`
+- To run worker process: `php cli.php worker`
+- To run update process: `php cli.php output`

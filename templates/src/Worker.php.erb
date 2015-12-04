@@ -2,7 +2,7 @@
 
 namespace <%=params[:namespace]%>;
 
-class Worker extends Singleton {
+class Worker extends \RavenTools\GridManager\Singleton {
 
 	public static $num_to_process = 100;
 
@@ -31,7 +31,9 @@ class Worker extends Singleton {
 		while($running) {
 			$response = $grid_manager_worker->run();
 
-			Log::info($response);
+			if($response['success'] > 0) {
+				Log::info($response);
+			}
 
 			if($response['failure'] > $response['success']) {
 				sleep(1);
