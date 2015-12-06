@@ -30,7 +30,8 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 			},
 			'queue_callback' => function($work_item) {
 				return true;
-			}
+			},
+			'shutdown_timeout' => '60 seconds'
 		));
     }
 
@@ -45,6 +46,8 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 	public function testRun() 
 	{
 		$response = $this->object->run();
+
+//		print_r($response);
 
 		$this->assertArrayHasKey("success",$response);
 		$this->assertEquals(1,$response['success']);
@@ -164,5 +167,24 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1,$response['failure']);
         $this->assertArrayHasKey("items",$response);
         $this->assertEquals(0,$response['items']);
+	}
+
+	public function testSetShutdownCallback() { 
+
+		$this->object->setNumToProcess(1);
+		$this->object->setShutdownTimeout("1 second");
+
+		$this->object->setDequeueCallback(function() {
+			return false;
+		});
+
+		$shutdown = null;
+		$this->object->setShutdownCallback(function() use (&$shutdown) {
+			$shutdown = "shut it down";
+		});
+
+		$response = $this->object->run();
+
+		$this->assertEquals("shut it down",$shutdown);
 	}
 }
