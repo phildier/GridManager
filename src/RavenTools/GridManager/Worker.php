@@ -5,12 +5,13 @@ namespace RavenTools\GridManager;
 class Worker {
 
 	protected $num_to_process = 1;
+	protected $num_processed = 0;
 
 	protected $dequeue_callback = null;
 	protected $work_item_callbacks = array();
 	protected $queue_callback = null;
 	protected $shutdown_callback = null;
-	protected $shutdown_timeout = "5 minutes";
+	protected $shutdown_timeout = null;
 	protected $process_exit_callback = null;
 
 	protected $start_ts = null;
@@ -66,7 +67,7 @@ class Worker {
 		}
 
 		if(array_key_exists("num_to_process",$params)) {
-			$this->num_to_process = $this->setNumToProcess($params['num_to_process']);
+			$this->setNumToProcess($params['num_to_process']);
 		}
 	}
 
@@ -160,7 +161,6 @@ class Worker {
 				);
 
 		$this->running = true;
-		$processed = 0;
 
 		while($this->running) {
 
@@ -187,7 +187,7 @@ class Worker {
 					$response['failure']++;
 				}
 
-				if(++$processed >= $this->num_to_process) {
+				if(++$this->num_processed >= $this->num_to_process) {
 					$this->running = false;
 					call_user_func($this->process_exit_callback);
 				} elseif($response['failure'] > $response['success']) {
@@ -197,12 +197,12 @@ class Worker {
 				}
 			} else {
 
-				if($this->last_item_ts < (time() - $this->shutdown_timeout)) {
+				if(!is_null($this->shutdown_timeout) && $this->last_item_ts < (time() - $this->shutdown_timeout)) {
 					$this->running = false;
 					call_user_func($this->shutdown_callback);
 				}
 
-				usleep(100);
+				usleep(500);
 			}
 		}
 
