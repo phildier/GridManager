@@ -21,7 +21,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 		if(array_key_exists("sqs_client",$params)) {
 			$this->sqs_client = $params['sqs_client'];
 		} else {
-			throw new Exception("sqs_client required");
+			throw new \Exception("sqs_client required");
 		}
 
 		if(array_key_exists("queue_name",$params)) {
@@ -30,7 +30,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 									"QueueName"=>$this->queue_name
 								))->get("QueueUrl");
 		} else {
-			throw new Exception("queue_name required");
+			throw new \Exception("queue_name required");
 		}
 
 		if(array_key_exists("timeout",$params)) {

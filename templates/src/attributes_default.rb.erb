@@ -4,5 +4,7 @@ default[:<%=params[:cookbook_name]%>][:deploy][:user] = "nobody"
 default[:<%=params[:cookbook_name]%>][:deploy][:branch] = "master"
 
 # worker parameters
+default[:<%=params[:cookbook_name]%>][:worker][:run] = false
 default[:<%=params[:cookbook_name]%>][:worker][:numprocs] = 1
+default[:<%=params[:cookbook_name]%>][:worker][:exitcodes] = [111]
 default[:<%=params[:cookbook_name]%>][:worker][:user] = default[:<%=params[:cookbook_name]%>][:deploy][:user]

@@ -4,12 +4,26 @@ namespace RavenTools\GridManager;
 
 class Worker {
 
+	protected $num_to_process = 1;
+
 	protected $dequeue_callback = null;
 	protected $work_item_callbacks = array();
 	protected $queue_callback = null;
+	protected $shutdown_callback = null;
+	protected $shutdown_timeout = "5 minutes";
+	protected $process_timeout = "5 minutes";
+
+	protected $start_ts = null;
+	protected $last_item_ts = null;
+
+	protected $running = null;
 
 	public function __construct(Array $params) {
+
 		$this->validateAndSetParams($params);
+
+		$this->start_ts = time();
+		$this->last_item_ts = time();
 	}
 
 	/**
@@ -35,6 +49,50 @@ class Worker {
 			$this->setQueueCallback($params['queue_callback']);
 		}
 
+		if(array_key_exists("shutdown_callback",$params)) {
+			$this->setShutdownCallback($params['shutdown_callback']);
+		} else {
+			$this->setShutdownCallback(function() { exit(111); });
+		}
+
+		if(array_key_exists("shutdown_timeout",$params)) {
+			$this->setShutdownTimeout($params['shutdown_timeout']);
+		}
+
+		if(array_key_exists("process_exit_callback",$params)) {
+			$this->setProcessExitCallback($params['process_exit_callback']);
+		} else {
+			$this->setProcessExitCallback(function() { exit(); });
+		}
+
+		if(array_key_exists("process_timeout",$params)) {
+			$this->setProcessTimeout($params['process_timeout']);
+		}
+
+		if(array_key_exists("num_to_process",$params)) {
+			$this->num_to_process = $this->setNumToProcess($params['num_to_process']);
+		}
+	}
+
+	/**
+	 * sets maximum number of jobs to process before exiting
+	 */
+	public function setNumToProcess($num) {
+		$this->num_to_process = $num;
+	}
+
+	/**
+	 * sets the shutdown timeout (process stops)
+	 */
+	public function setShutdownTimeout($shutdown_timeout) {
+		$this->shutdown_timeout = strtotime($shutdown_timeout) - time();
+	}
+
+	/**
+	 * sets the process timeout (process stops and restarts)
+	 */
+	public function setProcessTimeout($process_timeout) {
+		$this->process_timeout = strtotime($process_timeout) - time();
 	}
 
 	/**
@@ -76,6 +134,28 @@ class Worker {
 	}
 
 	/**
+	 * sets a callback to run when the worker has been idle too long
+	 */
+	public function setShutdownCallback($callback) {
+		if(is_callable($callback)) {
+			$this->shutdown_callback = $callback;
+		} else {
+			throw new \Exception("callable argument required");
+		}
+	}
+
+	/**
+	 * sets a callback to run when the worker has processed $this->num_to_process results
+	 */
+	public function setProcessExitCallback($callback) {
+		if(is_callable($callback)) {
+			$this->process_exit_callback = $callback;
+		} else {
+			throw new \Exception("callable argument required");
+		}
+	}
+
+	/**
 	 * runs the output job
 	 * - dequeues one or more output items
 	 * - runs output item through output item callback chain
@@ -90,27 +170,55 @@ class Worker {
 				"items" => 0
 				);
 
-		$cb = $this->dequeue_callback;
-		$data = call_user_func($cb);
+		$this->running = true;
+		$processed = 0;
 
-		$output_item_buffer = array();
+		while($this->running) {
 
-		if($data !== false) {
-			foreach($data as $work_item) {
+			$data = call_user_func($this->dequeue_callback);
 
-				foreach($this->work_item_callbacks as $cb) {
-					$work_item = call_user_func($cb,$work_item);
+			$output_item_buffer = array();
+
+			if($data !== false) {
+				$this->last_item_ts = time();
+
+				foreach($data as $work_item) {
+
+					foreach($this->work_item_callbacks as $cb) {
+						$work_item = call_user_func($cb,$work_item);
+					}
+
+					$output_item_buffer[] = $work_item;
 				}
 
-				$output_item_buffer[] = $work_item;
-			}
+				if(call_user_func($this->queue_callback,$output_item_buffer) === true) {
+					$response['success']++;
+					$response['items'] += count($output_item_buffer);
+				} else {
+					$response['failure']++;
+				}
 
-			$cb = $this->queue_callback;
-			if(call_user_func($cb,$output_item_buffer) === true) {
-				$response['success'] = 1;
-				$response['items'] += count($output_item_buffer);
+				if(++$processed >= $this->num_to_process) {
+					$this->running = false;
+					call_user_func($this->process_exit_callback);
+				} elseif($response['failure'] > $response['success']) {
+					sleep(1);
+				} elseif($response['failure'] == 0 && $response['success'] == 0) {
+					sleep(1);
+				}
 			} else {
-				$response['failure'] = 1;
+
+				if($this->last_item_ts < (time() - $this->process_timeout)) {
+					$this->running = false;
+					call_user_func($this->process_exit_callback);
+				}
+
+				if($this->last_item_ts < (time() - $this->shutdown_timeout)) {
+					$this->running = false;
+					call_user_func($this->shutdown_callback);
+				}
+
+				usleep(100);
 			}
 		}
 
