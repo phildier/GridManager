@@ -47,8 +47,6 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 	{
 		$response = $this->object->run();
 
-//		print_r($response);
-
 		$this->assertArrayHasKey("success",$response);
 		$this->assertEquals(1,$response['success']);
 		$this->assertArrayHasKey("failure",$response);
