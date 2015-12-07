@@ -180,11 +180,49 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 
 		$shutdown = null;
 		$this->object->setShutdownCallback(function() use (&$shutdown) {
-			$shutdown = "shut it down";
+			$shutdown = "shutting down";
 		});
 
+		// test shutdown timeout and callback
 		$response = $this->object->run();
+		$this->assertEquals("shutting down",$shutdown);
+	}
 
-		$this->assertEquals("shut it down",$shutdown);
+	public function testSetProcessExitCallback() {
+
+		$num_to_process = 10;
+
+		$this->object->setNumToProcess($num_to_process);
+		$this->object->setProcessTimeout("1 seconds");
+
+		$this->object->setDequeueCallback(function() {
+			return array("item");
+		});
+
+		$process_exit = null;
+		$this->object->setProcessExitCallback(function() use (&$process_exit) {
+			$process_exit = "exiting due to processing limit";
+		});
+
+		// test num_to_process limit
+		$response = $this->object->run();
+		$this->assertEquals($num_to_process,$response['success']);
+		$this->assertEquals($num_to_process,$response['items']);
+		$this->assertEquals("exiting due to processing limit",$process_exit);
+
+		$this->object->setDequeueCallback(function() {
+			return false;
+		});
+
+		$process_exit = null;
+		$this->object->setProcessExitCallback(function() use (&$process_exit) {
+			$process_exit = "exiting due to process timeout";
+		});
+
+		// test process timeout
+		$response = $this->object->run();
+		$this->assertEquals(0,$response['success']);
+		$this->assertEquals(0,$response['items']);
+		$this->assertEquals("exiting due to process timeout",$process_exit);
 	}
 }

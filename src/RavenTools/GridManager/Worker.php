@@ -59,6 +59,12 @@ class Worker {
 			$this->setShutdownTimeout($params['shutdown_timeout']);
 		}
 
+		if(array_key_exists("process_exit_callback",$params)) {
+			$this->setProcessExitCallback($params['process_exit_callback']);
+		} else {
+			$this->setProcessExitCallback(function() { });
+		}
+
 		if(array_key_exists("process_timeout",$params)) {
 			$this->setProcessTimeout($params['process_timeout']);
 		}
@@ -139,6 +145,17 @@ class Worker {
 	}
 
 	/**
+	 * sets a callback to run when the worker has processed $this->num_to_process results
+	 */
+	public function setProcessExitCallback($callback) {
+		if(is_callable($callback)) {
+			$this->process_exit_callback = $callback;
+		} else {
+			throw new \Exception("callable argument required");
+		}
+	}
+
+	/**
 	 * runs the output job
 	 * - dequeues one or more output items
 	 * - runs output item through output item callback chain
@@ -183,6 +200,7 @@ class Worker {
 
 				if(++$processed >= $this->num_to_process) {
 					$this->running = false;
+					call_user_func($this->process_exit_callback);
 				} elseif($response['failure'] > $response['success']) {
 					sleep(1);
 				} elseif($response['failure'] == 0 && $response['success'] == 0) {
@@ -192,6 +210,7 @@ class Worker {
 
 				if($this->last_item_ts < (time() - $this->process_timeout)) {
 					$this->running = false;
+					call_user_func($this->process_exit_callback);
 				}
 
 				if($this->last_item_ts < (time() - $this->shutdown_timeout)) {
@@ -199,7 +218,7 @@ class Worker {
 					call_user_func($this->shutdown_callback);
 				}
 
-				usleep(1000);
+				usleep(100);
 			}
 		}
 
