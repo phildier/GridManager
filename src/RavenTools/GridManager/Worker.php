@@ -52,7 +52,7 @@ class Worker {
 		if(array_key_exists("shutdown_callback",$params)) {
 			$this->setShutdownCallback($params['shutdown_callback']);
 		} else {
-			$this->setShutdownCallback(function() { });
+			$this->setShutdownCallback(function() { exit(111); });
 		}
 
 		if(array_key_exists("shutdown_timeout",$params)) {
@@ -62,7 +62,7 @@ class Worker {
 		if(array_key_exists("process_exit_callback",$params)) {
 			$this->setProcessExitCallback($params['process_exit_callback']);
 		} else {
-			$this->setProcessExitCallback(function() { });
+			$this->setProcessExitCallback(function() { exit(); });
 		}
 
 		if(array_key_exists("process_timeout",$params)) {

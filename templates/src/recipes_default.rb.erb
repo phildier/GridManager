@@ -23,6 +23,7 @@ raven_supervisor_program "<%=params[:program_name]%>" do
 	command "php cli.php worker"
 	numprocs node[:<%=params[:cookbook_name]%>][:worker][:numprocs]
 	user node[:<%=params[:cookbook_name]%>][:worker][:user]
+	exitcodes node[:<%=params[:cookbook_name]%>][:worker][:exitcodes]
 
 	notifies :restart, "service[supervisord]", :delayed
 end
