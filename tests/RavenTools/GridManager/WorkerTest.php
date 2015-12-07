@@ -31,6 +31,8 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 			'queue_callback' => function($work_item) {
 				return true;
 			},
+			'process_exit_callback' => function() { },
+			'shutdown_callback' => function() { },
 			'shutdown_timeout' => '60 seconds'
 		));
     }
