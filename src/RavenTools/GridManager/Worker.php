@@ -11,7 +11,7 @@ class Worker {
 	protected $queue_callback = null;
 	protected $shutdown_callback = null;
 	protected $shutdown_timeout = "5 minutes";
-	protected $process_timeout = "5 minutes";
+	protected $process_exit_callback = null;
 
 	protected $start_ts = null;
 	protected $last_item_ts = null;
@@ -65,10 +65,6 @@ class Worker {
 			$this->setProcessExitCallback(function() { exit(); });
 		}
 
-		if(array_key_exists("process_timeout",$params)) {
-			$this->setProcessTimeout($params['process_timeout']);
-		}
-
 		if(array_key_exists("num_to_process",$params)) {
 			$this->num_to_process = $this->setNumToProcess($params['num_to_process']);
 		}
@@ -86,13 +82,6 @@ class Worker {
 	 */
 	public function setShutdownTimeout($shutdown_timeout) {
 		$this->shutdown_timeout = strtotime($shutdown_timeout) - time();
-	}
-
-	/**
-	 * sets the process timeout (process stops and restarts)
-	 */
-	public function setProcessTimeout($process_timeout) {
-		$this->process_timeout = strtotime($process_timeout) - time();
 	}
 
 	/**
@@ -207,11 +196,6 @@ class Worker {
 					sleep(1);
 				}
 			} else {
-
-				if($this->last_item_ts < (time() - $this->process_timeout)) {
-					$this->running = false;
-					call_user_func($this->process_exit_callback);
-				}
 
 				if($this->last_item_ts < (time() - $this->shutdown_timeout)) {
 					$this->running = false;
