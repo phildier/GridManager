@@ -12,7 +12,9 @@
             "email": "phil@raventools.com"
         }
     ],
-    "require": {},
+    "require": {
+        "domnikl/statsd": "^2.2"
+    },
     "require-dev":{
         "mockery/mockery":"0.9.4"
     }
