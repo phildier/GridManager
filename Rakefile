@@ -107,7 +107,7 @@ file role_path => role_dir do
 		],
 		"env_run_lists" => { }
 	}
-	json_file(role_path, role_params);
+	json_file(role_path, role_params)
 end
 
 # configure shell provisioner
@@ -242,6 +242,33 @@ file log_class_path => php_namespace_dir do
 	erb_sub(log_class_src, log_class_path, params)
 end
 
+phpunit_dir = "#{template_outdir}/tests"
+directory phpunit_dir
+phpunit_bootstrap_src = "#{template_srcdir}/phpunit_bootstrap.php.erb"
+phpunit_bootstrap_path = "#{phpunit_dir}/bootstrap.php"
+file phpunit_bootstrap_path => phpunit_dir do
+	params = {
+		:namespace => classify(template_name)
+	}
+	erb_sub(phpunit_bootstrap_src, phpunit_bootstrap_path, params)
+end
+
+phpunit_xml_src = "#{template_srcdir}/phpunit.xml.erb"
+phpunit_xml_path = "#{template_outdir}/phpunit.xml"
+file phpunit_xml_path => phpunit_dir do
+	params = {
+		:namespace => classify(template_name)
+	}
+	erb_sub(phpunit_xml_src, phpunit_xml_path, params)
+end
+
+config_json_path = "#{template_outdir}/config.json"
+file config_json_path => template_outdir do
+	config_json_params = {
+		:timezone => "US/Eastern"
+	}
+	json_file(config_json_path, config_json_params)
+end
 
 task :init_php_app => [
 	composer_path,
@@ -252,8 +279,31 @@ task :init_php_app => [
 	output_class_path,
 	worker_class_path,
 	singleton_class_path,
-	log_class_path
+	log_class_path,
+	phpunit_bootstrap_path,
+	phpunit_xml_path,
+	config_json_path
 	]
+
+# = other files
+# == .gitignore 
+gitignore_path = "#{template_outdir}/.gitignore"
+file gitignore_path => template_outdir do
+	contents = <<-EOH
+cache
+vendor
+*.swp
+*.swo
+overrides.json
+.vagrant
+berks-cookbooks
+EOH
+	put_file(gitignore_path,contents)
+end
+
+task :other_files => [
+	gitignore_path
+]
 
 # set up task and defaults
 task :init => [
@@ -263,7 +313,8 @@ task :init => [
 	role_path, 
 	bootstrap_script, 
 	cache_dir, 
-	:init_php_app
+	:init_php_app,
+	:other_files
 ]
 task :default => [:init]
 
@@ -273,13 +324,19 @@ def erb_sub(src, dst, params)
 	out_str = ERB.new(File.read(src)).result binding
 	# write resulting file
 	File.open(dst,'w') do |f|
-		f.write(out_str)
+		f.write out_str
 	end
 end
 
 def json_file(path, contents)
 	File.open(path,'w') do |f|
 		f.write JSON.pretty_generate(contents)
+	end
+end
+
+def put_file(path, contents)
+	File.open(path,'w') do |f|
+		f.write contents
 	end
 end
 

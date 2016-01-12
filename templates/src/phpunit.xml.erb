@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false"
+		 backupStaticAttributes="false"
+		 bootstrap="./tests/bootstrap.php"
+		 syntaxCheck="true"
+		 colors="false">
+
+	<testsuites>
+		<testsuite name="<%=params[:namespace]%>">
+			<directory suffix="Test.php">includes/<%=params[:namespace]%>/</directory>
+		</testsuite>
+	</testsuites>
+
+</phpunit>
