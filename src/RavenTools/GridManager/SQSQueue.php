@@ -7,7 +7,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 	protected $sqs_client = null;
 	protected $queue_name = null;
 	protected $queue_url = null;
-	protected $timeout = null;
+	protected $timeout = 1;
 
 	public function __construct(Array $params) {
 		$this->validateAndSetParams($params);
