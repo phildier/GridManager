@@ -4,8 +4,57 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bb8143a0cca288be3a2f108772e07264",
-    "packages": [],
+    "hash": "1959ad1a1885beb3a9788e5b5eb4364d",
+    "content-hash": "83780b76498665ecc7c33ee6549917cf",
+    "packages": [
+        {
+            "name": "domnikl/statsd",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/domnikl/statsd-php.git",
+                "reference": "6e869109067777dcea56c88759c0e9df7f47c843"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/domnikl/statsd-php/zipball/6e869109067777dcea56c88759c0e9df7f47c843",
+                "reference": "6e869109067777dcea56c88759c0e9df7f47c843",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">= 4.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Domnikl\\Statsd\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dominik Liebler",
+                    "email": "liebler.dominik@gmail.com"
+                }
+            ],
+            "description": "a PHP client for statsd",
+            "homepage": "https://domnikl.github.com/statsd-php",
+            "keywords": [
+                "Metrics",
+                "monitoring",
+                "statistics",
+                "statsd",
+                "udp"
+            ],
+            "time": "2015-10-29 09:44:21"
+        }
+    ],
     "packages-dev": [
         {
             "name": "hamcrest/hamcrest-php",
