@@ -115,6 +115,11 @@ class Output {
 			$cb = $this->dequeue_callback;
 			$data = call_user_func($cb,$this->dequeue_batch_size);
 
+			if($data === false) {
+				usleep(500);
+				continue;
+			}
+
 			foreach($data as $d) {
 
 				$output_item = $d;

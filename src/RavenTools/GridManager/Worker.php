@@ -32,11 +32,11 @@ class Worker {
 	 */
 	protected function validateAndSetParams(Array $params) {
 
-		if(array_key_exists("dequeue_callback",$params)) {
+		if(array_key_exists("dequeue_callback",$params) && is_callable($params['dequeue_callback'])) {
 			$this->setDequeueCallback($params['dequeue_callback']);
 		}
 
-		if(array_key_exists("work_item_callback",$params)) {
+		if(array_key_exists("work_item_callback",$params) && is_callable($params['work_item_callback'])) {
 			if(is_callable($params['work_item_callback'])) {
 				$this->addWorkItemCallback($params['work_item_callback']);
 			} elseif(is_array($params['work_item_callback'])) {
@@ -46,11 +46,11 @@ class Worker {
 			}
 		}
 
-		if(array_key_exists("queue_callback",$params)) {
+		if(array_key_exists("queue_callback",$params) && is_callable($params['queue_callback'])) {
 			$this->setQueueCallback($params['queue_callback']);
 		}
 
-		if(array_key_exists("shutdown_callback",$params)) {
+		if(array_key_exists("shutdown_callback",$params) && is_callable($params['shutdown_callback'])) {
 			$this->setShutdownCallback($params['shutdown_callback']);
 		} else {
 			$this->setShutdownCallback(function() { exit(111); });
@@ -60,7 +60,7 @@ class Worker {
 			$this->setShutdownTimeout($params['shutdown_timeout']);
 		}
 
-		if(array_key_exists("process_exit_callback",$params)) {
+		if(array_key_exists("process_exit_callback",$params) && is_callable($params['process_exit_callback'])) {
 			$this->setProcessExitCallback($params['process_exit_callback']);
 		} else {
 			$this->setProcessExitCallback(function() { exit(); });
