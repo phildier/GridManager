@@ -36,12 +36,14 @@ class Worker {
 			$this->setDequeueCallback($params['dequeue_callback']);
 		}
 
-		if(array_key_exists("work_item_callback",$params) && is_callable($params['work_item_callback'])) {
+		if(array_key_exists("work_item_callback",$params)) {
 			if(is_callable($params['work_item_callback'])) {
 				$this->addWorkItemCallback($params['work_item_callback']);
 			} elseif(is_array($params['work_item_callback'])) {
 				foreach($params['work_item_callback'] as $c) {
-					$this->addWorkItemCallback($c);
+					if(is_callable($c)) {
+						$this->addWorkItemCallback($c);
+					}
 				}
 			}
 		}
@@ -110,6 +112,10 @@ class Worker {
 		} else {
 			throw new \Exception("callable argument required");
 		}
+	}
+
+	public function getWorkItemCallbacks() {
+		return $this->work_item_callbacks;
 	}
 
 	/**

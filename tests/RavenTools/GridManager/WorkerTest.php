@@ -45,6 +45,28 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+	public function testInitWorkItemCallbackArray() {
+
+		$callbacks = [
+			function() {},
+			function() {}
+		];
+
+		// test constructing w/ an array
+		$w = new Worker([
+			"work_item_callback" => $callbacks
+		]);
+
+		$this->assertSame($callbacks,$w->getWorkItemCallbacks());
+
+		// test adding subsequent callback
+		$cb = function() {};
+		$w->addWorkItemCallback($cb);
+		$callbacks[] = $cb;
+
+		$this->assertSame($callbacks,$w->getWorkItemCallbacks());
+	}
+
 	public function testRun() 
 	{
 		$response = $this->object->run();
