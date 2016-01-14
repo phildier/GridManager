@@ -167,6 +167,6 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey("failure",$response);
         $this->assertEquals(1,$response['failure']);
         $this->assertArrayHasKey("items",$response);
-        $this->assertEquals(0,$response['items']);
+        $this->assertEquals(4,$response['items']);
 	}
 }

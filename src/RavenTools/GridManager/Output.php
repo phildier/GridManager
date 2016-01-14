@@ -130,8 +130,9 @@ class Output {
 
 				if(count($write_data_buffer) < $this->write_data_batch_size) {
 					$write_data_buffer[] = $output_item;
-				} else {
+				}
 
+				if(count($write_data_buffer) >= $this->write_data_batch_size) {
 					$this->writeData($write_data_buffer,$response);
 
 					// TODO sane failed write_data retries.
@@ -154,10 +155,11 @@ class Output {
 	 */
 	protected function writeData(Array $buffer,&$response) {
 
+		$response['items'] += count($buffer);
+
 		$cb = $this->write_data_callback;
 		if(call_user_func($cb,$buffer) === true) {
 			$response['success']++;
-			$response['items'] += count($buffer);
 			return true;
 		} else {
 			$response['failure']++;
