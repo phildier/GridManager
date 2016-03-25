@@ -158,7 +158,7 @@ class Output {
 		$response['items'] += count($buffer);
 
 		$cb = $this->write_data_callback;
-		if(call_user_func($cb,$buffer) === true) {
+		if(call_user_func($cb,$buffer) !== false) {
 			$response['success']++;
 			return true;
 		} else {
