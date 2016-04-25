@@ -8,6 +8,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 	protected $queue_name = null;
 	protected $queue_url = null;
 	protected $timeout = 1;
+	protected $visibility_timeout = 300;
 
 	public function __construct(Array $params) {
 		$this->validateAndSetParams($params);
@@ -36,6 +37,18 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 		if(array_key_exists("timeout",$params)) {
 			$this->timeout = $params['timeout'];
 		}
+
+		if(array_key_exists("visibility_timeout",$params)) {
+			$this->visibility_timeout = $params['visibility_timeout'];
+		}
+	}
+
+	public function setSQSClient($client) {
+		$this->sqs_client = $client;
+	}
+
+	public function getSQSClient() {
+		return $this->sqs_client;
 	}
 
 	/**
@@ -112,6 +125,25 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 			return false;
 		}
 		return $response->getPath("Attributes/ApproximateNumberOfMessages");
+	}
+
+	/**
+	 * creates the queue
+	 */
+	public function create() {
+
+		try {
+			$this->sqs_client->createQueue([
+				'QueueName' => $this->queue_name,
+				'Attributes' => [
+					'VisibilityTimeout' => $this->visibility_timeout
+				]
+			]);
+		} catch(\Exception $e) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
