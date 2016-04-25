@@ -23,4 +23,9 @@ interface QueueInterface {
 	 * return the current queue length
 	 */
 	public function length();
+
+	/**
+	 * creates the queue
+	 */
+	public function create();
 }

@@ -129,4 +129,25 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$response = $this->object->length();
 		$this->assertFalse($response);
 	}
+
+	/**
+	 * @covers SQSQueue::create
+	 */
+	public function testCreate() {
+
+		$sqs_client_mock = m::mock("SQSClient");
+		$sqs_client_mock 
+			->shouldReceive("createQueue");
+		$this->object->setSQSClient($sqs_client_mock);
+
+		$this->assertTrue($this->object->create());
+
+		$sqs_client_mock = m::mock("SQSClient");
+		$sqs_client_mock 
+			->shouldReceive("createQueue")
+			->andThrow(new \Exception("some aws exception"));
+		$this->object->setSQSClient($sqs_client_mock);
+
+		$this->assertFalse($this->object->create());
+	}
 }
