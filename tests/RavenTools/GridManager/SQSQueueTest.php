@@ -40,6 +40,38 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * @covers SQSQueue::getQueueName
+	 * @covers SQSQueue::setQueueName
+	 */
+	public function testGetQueueName() {
+		$this->object->setQueueName("phpunit");
+		$this->assertEquals("phpunit",$this->object->getQueueName());
+	}
+
+	/**
+	 * @covers SQSQueue::getQueueUrl
+	 * @covers SQSQueue::setQueueUrl
+	 */
+	public function testGetQueueUrl() {
+
+		$this->assertEquals("https://sqs.amazon.com/test_queue",$this->object->getQueueUrl());
+
+		$url = "http://127.0.0.1/bogoqueue";
+		$this->object->setQueueUrl($url);
+		$this->assertEquals($url,$this->object->getQueueUrl());
+	}
+
+	/**
+	 * @covers SQSQueue::getQueueUrl
+	 */
+	public function testGetQueueUrlException() {
+
+		$this->object->setQueueName(null);
+		$this->setExpectedException("\Exception");
+		$this->object->getQueueUrl();
+	}
+
+	/**
 	 * @covers SQSQueue::send
 	 */
 	public function testSend()
