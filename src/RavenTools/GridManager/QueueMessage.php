@@ -11,7 +11,7 @@ class QueueMessage {
 	private $work_item = null;
 
 	public function __construct($params = []) {
-		if(array_key_exists('queue',$params) && !is_object($params['queue'])) {
+		if(array_key_exists('queue',$params) && is_object($params['queue'])) {
 			$this->setQueue($params['queue']);
 		}
 
