@@ -8,7 +8,7 @@ class QueueMessage {
 
 	private $queue = null;
 	private $handle = null;
-	private $body = null;
+	private $work_item = null;
 
 	public function __construct($params = []) {
 		if(array_key_exists('queue',$params) && !is_object($params['queue'])) {
@@ -19,8 +19,8 @@ class QueueMessage {
 			$this->setHandle($params['handle']);
 		}
 
-		if(array_key_exists('body',$params) && !empty($params['body'])) {
-			$this->setBody($params['body']);
+		if(array_key_exists('work_item',$params) && !empty($params['work_item'])) {
+			$this->setWorkItem($params['work_item']);
 		}
 	}
 
@@ -44,12 +44,12 @@ class QueueMessage {
 		return $this->handle;
 	}
 
-	public function setBody($body) {
-		$this->body = $body;
+	public function setWorkItem($work_item) {
+		$this->work_item = $work_item;
 	}
 
-	public function getBody() {
-		return $this->body;
+	public function getWorkItem() {
+		return $this->work_item;
 	}
 
 	public function delete() {

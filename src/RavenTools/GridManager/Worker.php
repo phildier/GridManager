@@ -8,7 +8,7 @@ class Worker {
 	protected $num_processed = 0;
 
 	protected $dequeue_callback = null;
-	protected $work_item_callbacks = array();
+	protected $queue_message_callbacks = array();
 	protected $queue_callback = null;
 	protected $shutdown_callback = null;
 	protected $shutdown_timeout = null;
@@ -36,13 +36,13 @@ class Worker {
 			$this->setDequeueCallback($params['dequeue_callback']);
 		}
 
-		if(array_key_exists("work_item_callback",$params)) {
-			if(is_callable($params['work_item_callback'])) {
-				$this->addWorkItemCallback($params['work_item_callback']);
-			} elseif(is_array($params['work_item_callback'])) {
-				foreach($params['work_item_callback'] as $c) {
+		if(array_key_exists("queue_message_callback",$params)) {
+			if(is_callable($params['queue_message_callback'])) {
+				$this->addQueueMessageCallback($params['queue_message_callback']);
+			} elseif(is_array($params['queue_message_callback'])) {
+				foreach($params['queue_message_callback'] as $c) {
 					if(is_callable($c)) {
-						$this->addWorkItemCallback($c);
+						$this->addQueueMessageCallback($c);
 					}
 				}
 			}
@@ -106,16 +106,16 @@ class Worker {
 	 * sent as the input to the next.  the resulting output items are batched and sent to the
 	 * write data callback.
 	 */
-	public function addWorkItemCallback($callback) {
+	public function addQueueMessageCallback($callback) {
 		if(is_callable($callback)) {
-			$this->work_item_callbacks[] = $callback;
+			$this->queue_message_callbacks[] = $callback;
 		} else {
 			throw new \Exception("callable argument required");
 		}
 	}
 
-	public function getWorkItemCallbacks() {
-		return $this->work_item_callbacks;
+	public function getQueueMessageCallbacks() {
+		return $this->queue_message_callbacks;
 	}
 
 	/**
@@ -177,13 +177,13 @@ class Worker {
 			if($data !== false) {
 				$this->last_item_ts = time();
 
-				foreach($data as $work_item) {
+				foreach($data as $queue_message) {
 
-					foreach($this->work_item_callbacks as $cb) {
-						$work_item = call_user_func($cb,$work_item);
+					foreach($this->queue_message_callbacks as $cb) {
+						$queue_message = call_user_func($cb,$queue_message);
 					}
 
-					$output_item_buffer[] = $work_item;
+					$output_item_buffer[] = $queue_message;
 				}
 
 				if(call_user_func($this->queue_callback,$output_item_buffer) === true) {

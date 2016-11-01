@@ -25,10 +25,10 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 						array("four","five","six")
 						);
 			},
-			'work_item_callback' => function($work_item) {
-				return $work_item;
+			'queue_message_callback' => function($queue_message) {
+				return $queue_message;
 			},
-			'queue_callback' => function($work_item) {
+			'queue_callback' => function($queue_message) {
 				return true;
 			},
 			'process_exit_callback' => function() { },
@@ -45,7 +45,7 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-	public function testInitWorkItemCallbackArray() {
+	public function testInitQueueMessageCallbackArray() {
 
 		$callbacks = [
 			function() {},
@@ -54,17 +54,17 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 
 		// test constructing w/ an array
 		$w = new Worker([
-			"work_item_callback" => $callbacks
+			"queue_message_callback" => $callbacks
 		]);
 
-		$this->assertSame($callbacks,$w->getWorkItemCallbacks());
+		$this->assertSame($callbacks,$w->getQueueMessageCallbacks());
 
 		// test adding subsequent callback
 		$cb = function() {};
-		$w->addWorkItemCallback($cb);
+		$w->addQueueMessageCallback($cb);
 		$callbacks[] = $cb;
 
-		$this->assertSame($callbacks,$w->getWorkItemCallbacks());
+		$this->assertSame($callbacks,$w->getQueueMessageCallbacks());
 	}
 
 	public function testRun() 
@@ -123,7 +123,7 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3,$response['items']);
 	}
 
-	public function testAddWorkItemCallback() {
+	public function testAddQueueMessageCallback() {
 
 		$this->object->setDequeueCallback(function() {
 			return array(
@@ -137,9 +137,9 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 			return array_reverse($item);
 		};
 
-		$this->object->addWorkItemCallback($cb);
-		$this->object->addWorkItemCallback($cb);
-		$this->object->addWorkItemCallback($cb);
+		$this->object->addQueueMessageCallback($cb);
+		$this->object->addQueueMessageCallback($cb);
+		$this->object->addQueueMessageCallback($cb);
 
 		$this->object->setQueueCallback(function($items) {
 			for($i=0;$i<count($items);$i++) {

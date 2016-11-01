@@ -1,6 +1,7 @@
 <?php
 
 use \RavenTools\GridManager\SQSQueue;
+use \RavenTools\GridManager\WorkItem;
 use \Mockery as m;
 
 /**
@@ -81,11 +82,11 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$this->sqs_client->shouldReceive('sendMessage')->once()->andReturn($guzzle_resource_model);
 		$this->sqs_client->shouldReceive('sendMessage')->once()->andThrow(new Exception("failed to send"));
 
-		$message = array(
+		$message = new WorkItem([
 			"one" => 1,
 			"two" => 2,
 			"three" => 3
-		);
+		]);
 
 		$response = $this->object->send($message);
 		$this->assertInstanceOf('Guzzle\Service\Resource\Model',$response);
@@ -121,8 +122,9 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$this->assertCount(2,$response);
 
 		foreach($response as $r) {
-			$this->assertObjectHasAttribute('handle',$r);
-			$this->assertObjectHasAttribute('body',$r);
+			$fixture = array_shift($response_messages);
+			$this->assertEquals($fixture['ReceiptHandle'],$r->getHandle());
+			$this->assertEquals($fixture['Body'],json_encode($r->getWorkItem()));
 		}
 
 		$response = $this->object->receive();

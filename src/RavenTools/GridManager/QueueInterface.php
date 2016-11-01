@@ -7,7 +7,7 @@ interface QueueInterface {
 	/**
 	 * adds a message to the queue
 	 */
-	public function send($message);
+	public function send(WorkItem $message);
 
 	/**
 	 * dequeues $num messages

@@ -112,7 +112,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 				'queue' => $this,
 				'handle' => $m['ReceiptHandle'],
 				// initialize a WorkItem from the message body
-				'body' => new WorkItem($this->decode($m['Body']))
+				'work_item' => new WorkItem($this->decode($m['Body']))
 			]);
 		}
 		return $ret;

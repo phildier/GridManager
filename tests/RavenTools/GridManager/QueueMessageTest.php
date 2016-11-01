@@ -26,10 +26,10 @@ class QueueMessageTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($handle,$this->object->getHandle());
 	}
 
-	public function testGetSetBody() {
-		$body = ['stuff' => 'things', 'other' => [1,2,3,4]];
-		$this->object->setBody($body);
-		$this->assertSame($body,$this->object->getBody());
+	public function testGetSetWorkItem() {
+		$work_item = ['stuff' => 'things', 'other' => [1,2,3,4]];
+		$this->object->setWorkItem($work_item);
+		$this->assertSame($work_item,$this->object->getWorkItem());
 	}
 
 	public function testDelete() {
