@@ -109,8 +109,9 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 		$ret = array();
 		foreach($messages as $m) {
 			$ret[] = (object)array(
-						"handle"=>$m["ReceiptHandle"],
-						"body"=>$this->decode($m["Body"])
+						"handle" => $m["ReceiptHandle"],
+						// initialize a WorkItem from the message body
+						"body" => new WorkItem($this->decode($m["Body"]))
 					);
 		}
 		return $ret;
