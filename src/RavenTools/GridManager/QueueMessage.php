@@ -59,7 +59,7 @@ class QueueMessage {
 	public function to_array() {
 		return [
 			'handle' => $this->getHandle(),
-			'work_item' => (string) $this->getWorkItem()
+			'work_item' => (object) $this->getWorkItem()->to_array()
 		];
 	}
 
