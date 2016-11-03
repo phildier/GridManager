@@ -24,7 +24,6 @@ class WorkItem implements JsonSerializable {
 			// we are setting a result key to a value
 			return $this->results[$key] = $value;
 		}
-		throw new InvalidArgumentException('tried to set a result value without a key');
 	}
 
 	public function __set($key,$value) {

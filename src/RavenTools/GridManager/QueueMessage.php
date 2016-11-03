@@ -55,4 +55,15 @@ class QueueMessage {
 	public function delete() {
 		return $this->getQueue()->delete($this->getHandle());
 	}
+
+	public function to_array() {
+		return [
+			'handle' => $this->getHandle(),
+			'work_item' => (string) $this->getWorkItem()
+		];
+	}
+
+	public function __toString() {
+		return print_r((object) $this->to_array(), true);
+	}
 }
