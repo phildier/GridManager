@@ -8,16 +8,24 @@ use StdClass;
 
 class WorkItem implements JsonSerializable {
 
-	private $state = null;
+	private $state = [
+		'params' => [],
+		'results' => []
+	];
 
 	public function __construct($state = null) {
 		if(is_object($state)) {
+			// ensure state is an array
+			$this->state = get_object_vars($state);
+		} elseif(is_array($state)) {
 			$this->state = $state;
-		} else {
-			$this->state = (object) [
-				'params' => new StdClass,
-				'results' => new StdClass
-			];
+		}
+
+		foreach(['params','results'] as $type) {
+			// ensure state properties are arrays
+			if(is_object($this->state[$type])) {
+				$this->state[$type] = get_object_vars($this->state['params']);
+			}
 		}
 	}
 
@@ -27,10 +35,10 @@ class WorkItem implements JsonSerializable {
 	public function params($key = null) {
 		if(is_null($key)) {
 			// we are asking for all params
-			return $this->state->params;
-		} elseif(is_string($key) && isset($this->state->params->{$key})) {
+			return $this->state['params'];
+		} elseif(is_string($key) && isset($this->state['params'][$key])) {
 			// we are asking for a specific result key
-			return $this->state->params->{$key};
+			return $this->state['params'][$key];
 		}
 	}
 
@@ -40,13 +48,13 @@ class WorkItem implements JsonSerializable {
 	public function results($key = null, $value = null) {
 		if(is_null($key)) {
 			// we are asking for all results
-			return $this->state->results;
-		} elseif(is_string($key) && is_null($value) && isset($this->state->results->{$key})) {
+			return $this->state['results'];
+		} elseif(is_string($key) && is_null($value) && array_key_exists($key,$this->state['results'])) {
 			// we are asking for a specific result key
-			return $this->state->results->{$key};
+			return $this->state['results'][$key];
 		} elseif(!empty($key) && is_string($key) && !is_null($value)) {
 			// we are setting a result key to a value
-			return $this->state->results->{$key} = $value;
+			return $this->state['results'][$key] = $value;
 		}
 	}
 
@@ -59,7 +67,7 @@ class WorkItem implements JsonSerializable {
 	}
 
 	public function to_array() {
-		return $this->results;
+		return $this->state;
 	}
 
 	public function jsonSerialize() {

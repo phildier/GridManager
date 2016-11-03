@@ -11,12 +11,12 @@ class WorkItemTest extends PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 
-		$this->state = (object) [
-			'params' => (object) [
+		$this->state = [
+			'params' => [
 				'account_id' => 'abcd-1234',
 				'session_id' => 'wxyz-7890'
 			],
-			'results' => (object) [
+			'results' => [
 				'status' => 'OK',
 				'error' => 'no error',
 				'things' => [
@@ -35,7 +35,7 @@ class WorkItemTest extends PHPUnit_Framework_TestCase {
 
 	public function testParamsGetKey() {
 		$this->assertEquals(
-			$this->state->params->session_id,
+			$this->state['params']['session_id'],
 			$this->object->params('session_id')
 		);
 	}
@@ -43,8 +43,8 @@ class WorkItemTest extends PHPUnit_Framework_TestCase {
 	public function testParamsGetAll() {
 
 		$response = $this->object->params();
-		$this->assertInstanceOf(StdClass::class,$response);
-		$this->assertEquals($this->state->params,$response);
+		$this->assertInternalType('array',$response);
+		$this->assertEquals($this->state['params'],$response);
 	}
 
 	public function testResultsSetGetKey() {
@@ -61,15 +61,15 @@ class WorkItemTest extends PHPUnit_Framework_TestCase {
 	public function testResultsGetAll() {
 
 		$response = $this->object->results();
-		$this->assertInstanceOf(StdClass::class,$response);
-		$this->assertEquals($this->state->results,$response);
+		$this->assertInternalType('array',$response);
+		$this->assertEquals($this->state['results'],$response);
 	}
 
 	public function testResultsNullKeyWithValues() {
 
 		$response = $this->object->results(null, [1,2,3]);
-		$this->assertInstanceOf(StdClass::class,$response);
-		$this->assertEquals($this->state->results,$response);
+		$this->assertInternalType('array',$response);
+		$this->assertEquals($this->state['results'],$response);
 	}
 
 	/**
