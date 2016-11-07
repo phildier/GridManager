@@ -24,7 +24,7 @@ class WorkItem implements JsonSerializable {
 		foreach(['params','results'] as $type) {
 			// ensure state properties are arrays
 			if(array_key_exists($type,$this->state) && is_object($this->state[$type])) {
-				$this->state[$type] = get_object_vars($this->state['params']);
+				$this->state[$type] = get_object_vars($this->state[$type]);
 			} elseif(!array_key_exists($type,$this->state)) {
 				$this->state[$type] = [];
 			}
