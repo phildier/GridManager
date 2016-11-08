@@ -4,7 +4,7 @@ namespace RavenTools\GridManager;
 
 use RuntimeException;
 
-class QueueMessage {
+class QueueMessage implements JsonSerializable {
 
 	private $queue = null;
 	private $handle = null;
@@ -61,6 +61,10 @@ class QueueMessage {
 			'handle' => $this->getHandle(),
 			'work_item' => (object) $this->getWorkItem()->to_array()
 		];
+	}
+
+	public function jsonSerialize() {
+		return $this->to_array();
 	}
 
 	public function __toString() {
