@@ -3,6 +3,7 @@
 namespace RavenTools\GridManager;
 
 use RuntimeException;
+use JsonSerializable;
 
 class QueueMessage implements JsonSerializable {
 
