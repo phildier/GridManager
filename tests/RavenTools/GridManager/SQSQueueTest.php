@@ -103,11 +103,11 @@ class SQSQueueTest extends PHPUnit_Framework_TestCase
 		$response_messages = array(
 			array(
 				"ReceiptHandle" => "deadbeef1",
-				"Body" => '{"Message":"My important sqs message 1"}'
+				"Body" => '{"params":{"Message":"My important sqs message 1"},"results":{"res":1}}'
 			),
 			array(
 				"ReceiptHandle" => "deadbeef2",
-				"Body" => '{"Message":"My important sqs message 2"}'
+				"Body" => '{"params":{"Message":"My important sqs message 2"},"results":{"res":2}}'
 			)
 		);
 
