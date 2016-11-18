@@ -75,7 +75,7 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 	 * pushes an object to the queue. 
 	 * returns response on success, false on failure
 	 */
-	public function send($message) {
+	public function send(WorkItem $message) {
 		try {
 			$response = $this->sqs_client->sendMessage(array(
 							"QueueUrl" => $this->getQueueUrl(),
@@ -108,10 +108,12 @@ class SQSQueue implements \RavenTools\GridManager\QueueInterface {
 
 		$ret = array();
 		foreach($messages as $m) {
-			$ret[] = (object)array(
-						"handle"=>$m["ReceiptHandle"],
-						"body"=>$this->decode($m["Body"])
-					);
+			$ret[] = new QueueMessage([
+				'queue' => $this,
+				'handle' => $m['ReceiptHandle'],
+				// initialize a WorkItem from the message body
+				'work_item' => new WorkItem($this->decode($m['Body']))
+			]);
 		}
 		return $ret;
 	}

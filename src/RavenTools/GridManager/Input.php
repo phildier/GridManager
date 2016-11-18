@@ -5,7 +5,7 @@ namespace RavenTools\GridManager;
 class Input {
 
 	protected $load_data_callback = null;
-	protected $work_item_callbacks = array();
+	protected $queue_message_callbacks = array();
 	protected $batch_size = 1000;
 
 	public function __construct(Array $params) {
@@ -21,12 +21,12 @@ class Input {
 			$this->setLoadDataCallback($params['load_data_callback']);
 		}
 
-		if(array_key_exists("work_item_callback",$params)) {
-			if(is_callable($params['work_item_callback'])) {
-				$this->addWorkItemCallback($params['work_item_callback']);
-			} elseif(is_array($params['work_item_callback'])) {
-				foreach($params['work_item_callback'] as $c) {
-					$this->addWorkItemCallback($c);
+		if(array_key_exists("queue_message_callback",$params)) {
+			if(is_callable($params['queue_message_callback'])) {
+				$this->addQueueMessageCallback($params['queue_message_callback']);
+			} elseif(is_array($params['queue_message_callback'])) {
+				foreach($params['queue_message_callback'] as $c) {
+					$this->addQueueMessageCallback($c);
 				}
 			}
 		}
@@ -58,9 +58,9 @@ class Input {
 	 * the callback is expected to return an array or object, which will be passed into the next callback
 	 * in the chain. the return from the final callback is pushed to the queue
 	 */
-	public function addWorkItemCallback($callback) {
+	public function addQueueMessageCallback($callback) {
 		if(is_callable($callback)) {
-			$this->work_item_callbacks[] = $callback;
+			$this->queue_message_callbacks[] = $callback;
 		} else {
 			throw new \Exception("callable argument required");
 		}
@@ -96,18 +96,18 @@ class Input {
 		$data = call_user_func($cb,$this->batch_size);
 
 		foreach($data as $d) {
-			$work_item = $d;
-			foreach($this->work_item_callbacks as $cb) {
-				$work_item = call_user_func($cb,$work_item);
+			$queue_message = $d;
+			foreach($this->queue_message_callbacks as $cb) {
+				$queue_message = call_user_func($cb,$queue_message);
 			}
 
-			if($work_item === false) {
+			if($queue_message === false) {
 				$response['skipped']++;
 				continue;
 			}
 
 			$cb = $this->queue_callback;
-			if(call_user_func($cb,$work_item) === true) {
+			if(call_user_func($cb,$queue_message) === true) {
 				$response['success']++;
 			} else {
 				$response['failure']++;

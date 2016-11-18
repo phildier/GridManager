@@ -1,5 +1,6 @@
 .DS_Store
 vendor/
 *.swp
-.*.swp
+*.swo
+*.un~
 templates/build/

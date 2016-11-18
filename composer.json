@@ -1,21 +1,23 @@
 {
-    "name": "RavenTools/GridManager",
-    "description": "Glue for managing autoscaling batch jobs",
-    "autoload":{
-        "psr-0":{
-            "RavenTools\\GridManager":"src"
-        }
-    },
-    "authors": [
-        {
-            "name": "Phil Dier",
-            "email": "phil@raventools.com"
-        }
-    ],
-    "require": {
-        "domnikl/statsd": "^2.2"
-    },
-    "require-dev":{
-        "mockery/mockery":"0.9.4"
-    }
+	"name": "RavenTools/GridManager",
+	"description": "Glue for managing autoscaling batch jobs",
+	"autoload": {
+		"psr-0": {
+			"RavenTools\\GridManager": "src"
+		}
+	},
+	"authors": [
+		{
+			"name": "Phil Dier",
+			"email": "phil@raventools.com"
+		}
+	],
+	"require": {
+		"domnikl/statsd": "^2.2",
+		"monolog/monolog": "^1.17",
+		"ruflin/elastica": "^3.2"
+	},
+	"require-dev": {
+		"mockery/mockery": "0.9.4"
+	}
 }

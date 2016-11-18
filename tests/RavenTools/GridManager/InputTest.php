@@ -25,10 +25,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
 						array("four","five","six")
 						);
 			},
-			'work_item_callback' => function($work_item) {
-				return $work_item;
+			'queue_message_callback' => function($queue_message) {
+				return $queue_message;
 			},
-			'queue_callback' => function($work_item) {
+			'queue_callback' => function($queue_message) {
 				return true;
 			}
 		));
@@ -63,15 +63,15 @@ class InputTest extends \PHPUnit_Framework_TestCase
 					);
 		});
 
-		$this->object->setQueueCallback(function($work_item) {
+		$this->object->setQueueCallback(function($queue_message) {
 			static $run = 0;
 			switch($run++) {
 				case 0:
-					return ($work_item[0] == "ten"); // true
+					return ($queue_message[0] == "ten"); // true
 				case 1:
-					return ($work_item[0] == "seven"); // true
+					return ($queue_message[0] == "seven"); // true
 				case 2:
-					return (count($work_item) > 0); // false
+					return (count($queue_message) > 0); // false
 			}
 		});
 
@@ -84,7 +84,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
 
 	}
 
-	public function testAddWorkItemCallback() 
+	public function testAddQueueMessageCallback() 
 	{
 		$this->object->setLoadDataCallback(function($batch_size) {
 			return array(
@@ -94,26 +94,26 @@ class InputTest extends \PHPUnit_Framework_TestCase
 					);
 		});
 
-		$array_reverse = function($work_item) {
-			return array_reverse($work_item);
+		$array_reverse = function($queue_message) {
+			return array_reverse($queue_message);
 		};
 
-		$this->object->addWorkItemCallback($array_reverse); // reverse
-		$this->object->addWorkItemCallback($array_reverse); // normal
-		$this->object->addWorkItemCallback($array_reverse); // reverse
+		$this->object->addQueueMessageCallback($array_reverse); // reverse
+		$this->object->addQueueMessageCallback($array_reverse); // normal
+		$this->object->addQueueMessageCallback($array_reverse); // reverse
 
 		// after this chain of work item callbacks are run, we should end up with reversed items
 		// this is testing that chaining work item callbacks is working correctly
 
-		$this->object->setQueueCallback(function($work_item) {
+		$this->object->setQueueCallback(function($queue_message) {
 			static $run = 0;
 			switch($run++) {
 				case 0:
-					return ($work_item[0] == "eight"); // true
+					return ($queue_message[0] == "eight"); // true
 				case 1:
-					return ($work_item[0] == "five"); // true
+					return ($queue_message[0] == "five"); // true
 				case 2:
-					return ($work_item[0] == "two"); // true
+					return ($queue_message[0] == "two"); // true
 			}
 		});
 
