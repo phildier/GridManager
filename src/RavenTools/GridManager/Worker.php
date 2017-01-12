@@ -140,6 +140,10 @@ class Worker {
 		}
 	}
 
+	public function getShutdownCallback() {
+		return $this->shutdown_callback;
+	}
+
 	/**
 	 * sets a callback to run when the worker has processed $this->num_to_process results
 	 */
@@ -205,10 +209,14 @@ class Worker {
 
 				if(!is_null($this->shutdown_timeout) && $this->last_item_ts < (time() - $this->shutdown_timeout)) {
 					$this->running = false;
-					call_user_func($this->shutdown_callback);
+					call_user_func($this->process_exit_callback);
 				}
 
 				usleep(500);
+			}
+
+			if(is_file("/tmp/halt_workers") && file_get_contents("/tmp/halt_workers") == "shutdown" && is_callable($this->shutdown_callback)) {
+				call_user_func($this->shutdown_callback);
 			}
 		}
 
