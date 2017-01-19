@@ -215,11 +215,42 @@ class Worker {
 				usleep(500);
 			}
 
-			if(is_file("/tmp/halt_workers") && file_get_contents("/tmp/halt_workers") == "shutdown" && is_callable($this->shutdown_callback)) {
-				call_user_func($this->shutdown_callback);
+			if($this->shouldHalt()) {
+				Log::info("shutdown requested");
+
+				if(is_callable($this->shutdown_callback)) {
+					Log::info("calling shutdown function");
+					call_user_func($this->shutdown_callback);
+				}
 			}
 		}
 
+		call_user_func($this->process_exit_callback);
+
 		return $response;
+	}
+
+	private function shouldHalt() {
+		$haltfile = "/tmp/halt_workers";
+		$procfile = sprintf('/proc/%s',getmypid());
+		clearstatcache($procfile);
+		$start_time = stat($procfile)[9];
+
+		if(!is_file($haltfile)) {
+			return false;
+		}
+
+		clearstatcache($haltfile);
+		clearstatcache($procfile);
+		$halt_time = stat($haltfile)[9];
+		if($halt_time < $start_time) {
+			return false;
+		}
+
+		if(file_get_contents($haltfile) !== "shutdown") {
+			return false;
+		}
+
+		return true;
 	}
 }
