@@ -205,9 +205,27 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
 			$shutdown = "shutting down";
 		});
 
-		// test shutdown timeout and callback
-		$response = $this->object->run();
+		$this->assertTrue(is_callable($this->object->getShutdownCallback()));
+	}
+
+	public function testWorkerShutdown() {
+
+		$this->object->setNumToProcess(1);
+		$this->object->setShutdownTimeout("1 second");
+
+		$this->object->setDequeueCallback(function() {
+			return false;
+		});
+
+		$shutdown = null;
+		$this->object->setShutdownCallback(function() use (&$shutdown) {
+			$shutdown = "shutting down";
+		});
+
+		file_put_contents("/tmp/halt_workers", "shutdown");
+		$this->object->run();
 		$this->assertEquals("shutting down",$shutdown);
+		unlink("/tmp/halt_workers");
 	}
 
 	public function testSetProcessExitCallback() {
