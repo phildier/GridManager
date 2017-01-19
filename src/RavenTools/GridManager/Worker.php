@@ -221,6 +221,8 @@ class Worker {
 					call_user_func($this->shutdown_callback);
 				}
 			} elseif($this->shouldRestart()) {
+				Log::info("restart requested");
+				sleep(2); // prevent flapping
 				$this->running = false;
 			}
 		}
