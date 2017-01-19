@@ -247,7 +247,7 @@ class Worker {
 			return false;
 		}
 
-		if(file_get_contents($haltfile) !== "shutdown") {
+		if(trim(file_get_contents($haltfile)) !== "shutdown") {
 			return false;
 		}
 
