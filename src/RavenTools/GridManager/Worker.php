@@ -199,7 +199,6 @@ class Worker {
 
 				if(++$this->num_processed >= $this->num_to_process) {
 					$this->running = false;
-					call_user_func($this->process_exit_callback);
 				} elseif($response['failure'] > $response['success']) {
 					sleep(1);
 				} elseif($response['failure'] == 0 && $response['success'] == 0) {
@@ -209,19 +208,20 @@ class Worker {
 
 				if(!is_null($this->shutdown_timeout) && $this->last_item_ts < (time() - $this->shutdown_timeout)) {
 					$this->running = false;
-					call_user_func($this->process_exit_callback);
 				}
 
 				usleep(500);
 			}
 
-			if($this->shouldHalt()) {
+			if($this->shouldShutdown()) {
 				Log::info("shutdown requested");
 
 				if(is_callable($this->shutdown_callback)) {
 					Log::info("calling shutdown function");
 					call_user_func($this->shutdown_callback);
 				}
+			} elseif($this->shouldRestart()) {
+				$this->running = false;
 			}
 		}
 
@@ -230,7 +230,18 @@ class Worker {
 		return $response;
 	}
 
-	private function shouldHalt() {
+	private function shouldShutdown() {
+		return $this->shouldExit("shutdown");
+	}
+
+	private function shouldRestart() {
+		return $this->shouldExit("restart");
+	}
+
+	/**
+	 * @param $type restart or shutdown
+	 */
+	private function shouldExit($type) {
 		$haltfile = "/tmp/halt_workers";
 		$procfile = sprintf('/proc/%s',getmypid());
 		clearstatcache($procfile);
@@ -247,7 +258,7 @@ class Worker {
 			return false;
 		}
 
-		if(trim(file_get_contents($haltfile)) !== "shutdown") {
+		if(trim(file_get_contents($haltfile)) !== $type) {
 			return false;
 		}
 
