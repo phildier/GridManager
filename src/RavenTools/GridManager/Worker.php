@@ -198,6 +198,7 @@ class Worker {
 				}
 
 				if(++$this->num_processed >= $this->num_to_process) {
+					Log::info(sprintf("Restart after processing %s jobs",$this->num_processed));
 					$this->running = false;
 				} elseif($response['failure'] > $response['success']) {
 					sleep(1);
@@ -207,6 +208,7 @@ class Worker {
 			} else {
 
 				if(!is_null($this->shutdown_timeout) && $this->last_item_ts < (time() - $this->shutdown_timeout)) {
+					Log::info("Restart due to timeout");
 					$this->running = false;
 				}
 
@@ -214,14 +216,14 @@ class Worker {
 			}
 
 			if($this->shouldShutdown()) {
-				Log::info("shutdown requested");
+				Log::info("Shutdown requested");
 
 				if(is_callable($this->shutdown_callback)) {
 					Log::info("calling shutdown function");
 					call_user_func($this->shutdown_callback);
 				}
 			} elseif($this->shouldRestart()) {
-				Log::info("restart requested");
+				Log::info("Restart requested");
 				sleep(2); // prevent flapping
 				$this->running = false;
 			}
