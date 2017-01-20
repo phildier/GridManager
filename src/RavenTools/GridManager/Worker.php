@@ -247,18 +247,14 @@ class Worker {
 	 */
 	private function shouldExit($type) {
 		$haltfile = "/tmp/halt_workers";
-		$procfile = sprintf('/proc/%s',getmypid());
-		clearstatcache($procfile);
-		$start_time = stat($procfile)[9];
 
 		if(!is_file($haltfile)) {
 			return false;
 		}
 
 		clearstatcache($haltfile);
-		clearstatcache($procfile);
 		$halt_time = stat($haltfile)[9];
-		if($halt_time < $start_time) {
+		if($halt_time < $this->start_ts) {
 			return false;
 		}
 
